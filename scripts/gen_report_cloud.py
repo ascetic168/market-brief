@@ -10,7 +10,7 @@ Usage:
         [--out-dir DIR] [--model MODEL] [--max-news 18]
 
 Env: LLM_API_TOKEN (API key for the OpenAI-compatible endpoint), optional
-LLM_BASE_URL / LLM_MODEL (defaults: Zhipu bigmodel.cn, glm-4.6). Default output
+LLM_BASE_URL / LLM_MODEL (defaults: Zhipu bigmodel.cn coding endpoint, glm-5.3-flash). Default output
 goes to reports/<market>/<session_date>/index.html; --out-dir overrides for
 testing. Prints a single-line JSON verdict.
 """
@@ -25,8 +25,8 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from report_helpers import cards_html, fmt, quote_table_html, sparkline_html  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-# OpenAI-compatible endpoint; default is Zhipu bigmodel.cn (GLM). Override via env.
-ENDPOINT = os.environ.get("LLM_BASE_URL", "https://open.bigmodel.cn/api/paas/v4/chat/completions")
+# OpenAI-compatible endpoint; default is Zhipu bigmodel.cn coding plan (GLM). Override via env.
+ENDPOINT = os.environ.get("LLM_BASE_URL", "https://open.bigmodel.cn/api/coding/paas/v4/chat/completions")
 DEFAULT_MODEL = os.environ.get("LLM_MODEL", "glm-5.3-flash")
 
 CARDS_SPECS = {

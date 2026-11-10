@@ -96,7 +96,7 @@ jobs:
         if: "!inputs.dry_run && steps.guard.outputs.skip != 'true' && steps.gate.outputs.skip != 'true'"
         env:
           LLM_API_TOKEN: ${{ secrets.LLM_API_TOKEN }}
-          LLM_BASE_URL: https://open.bigmodel.cn/api/paas/v4/chat/completions
+          LLM_BASE_URL: https://open.bigmodel.cn/api/coding/paas/v4/chat/completions
           LLM_MODEL: ${{ vars.LLM_MODEL || 'glm-5.3-flash' }}
         run: |
           python scripts/gen_report_cloud.py tw "${{ steps.gate.outputs.data_file }}" "${{ steps.gate.outputs.news_file }}"
