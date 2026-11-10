@@ -53,9 +53,18 @@ def group_of(market, sym):
 
 
 def build_blocks(market, quotes):
-    cards = cards_html([(label, disp, quotes[sym]) for sym, label, disp in CARDS_SPECS[market] if sym in quotes])
-    rows = [(v.get("name") or sym, sym.split(".")[0] if not sym.startswith("^") else sym.replace("^", ""),
-            group_of(market, sym), v, "") for sym, v in quotes.items() if "error" not in v]
+    # .cards flex wrapper is Python's job, never the LLM's — keeps the
+    # horizontal card layout deterministic across runs.
+    cards = '<div class="cards">\n%s\n  </div>' % cards_html(
+        [(label, disp, quotes[sym]) for sym, label, disp in CARDS_SPECS[market] if sym in quotes])
+    rows = []
+    for sym, v in quotes.items():
+        if "error" in v:
+            continue
+        if sym.startswith("^") and v.get("volume") == 0:
+            v = dict(v, volume=None)  # index quotes carry no volume; show —
+        rows.append((v.get("name") or sym, sym.split(".")[0] if not sym.startswith("^") else sym.replace("^", ""),
+                     group_of(market, sym), v, ""))
     table = quote_table_html(rows, "表 1：%s主要指數與標的收盤行情（紅漲／綠跌；資料：Yahoo Finance 定案數據）" % MARKET_NAME[market],
                              extra_col="成交量")
     sparks = "\n".join(
@@ -112,7 +121,7 @@ SYSTEM_TMPL = """你是「經濟循環研究 · 收盤快報」的資深撰述�
 - meta_line：一行，含 收盤定案日期（%(session)s）與 資料來源：Yahoo Finance 定案數據＋當日新聞彙整。
 - summary_html：以 <b>一句話結論：</b> 開頭，100–250 字，量價＋事件＋結構三要素；可用 <b class="up">／<b class="down">。
 - sections 至少五節，依序：
-  1.「一、收盤快照」body_html 必須剛好包含兩行佔位符：__CARDS__ 與 __TABLE__（各自一行，前後可加一句導言與表註 <p class="caption">）。
+  1.「一、收盤快照」body_html 必須剛好包含兩行佔位符：__CARDS__ 與 __TABLE__（各自獨立一行，__CARDS__ 會被替換成完整的三格卡片區塊、__TABLE__ 會被替換成完整表格＋表註——不要用自己的 div 包住佔位符；佔位符前可加一句導言）。
   2.「二、全日走勢」body_html 必須包含 __SPARKS__ 一行（可加一段走勢解讀文字）。
   3.「三、收盤解讀：…」當日主題式小標；2–4 個 <li>，每個以 <b>粗體重點</b> 開頭；講為什麼與結構，引用新聞要指明媒體名；數字一律用【市場數據】區的值。
   4. 依當日情況 0–2 個進階節（名家框架印證／政策與事件／對另一市場的連動／階段防線——防線表用 <table class="stage">，區間照 CONTEXT，但「現況」欄依當日數據重算）。

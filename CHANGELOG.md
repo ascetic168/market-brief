@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.1] - 2026-11-10
+
+### Fixed
+
+- Snapshot card layout is now deterministic: the `.cards` flex wrapper is
+  inserted by Python, not left to the LLM — the cloud-generated TW 2026-11-10
+  report had the three snapshot cards stacked full-width because the model
+  omitted the wrapper. The published report was repaired in place (layout
+  only; no content changed) and all future reports are guaranteed horizontal.
+- Quote table: index rows (`^`-prefixed symbols) no longer show a stray `0`
+  in the volume column (Yahoo reports 0 volume for indices); they now show —.
+
+### Added
+
+- Catch-up schedules (+30 min) on both report workflows as resilience against
+  GitHub Actions scheduler drops; the idempotent trading-day gate makes
+  double triggers harmless.
+
 ## [0.2.0] - 2026-11-10
 
 ### Added
