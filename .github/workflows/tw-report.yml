@@ -66,7 +66,7 @@ jobs:
           verdict = json.loads(open("/tmp/verdict.txt").read().strip().splitlines()[-1])
           skip = (not verdict.get("ok")) or verdict.get("report_exists")
           reason = verdict.get("reason") or ("report_exists for %s" % verdict.get("session_date") if verdict.get("report_exists") else "")
-          today = verdict.get("today") or __import__("time").strftime("%Y%m%d", __import__("time").gmtime(__import__("time").time() + 8 * 3600))
+          today = (verdict.get("today") or __import__("time").strftime("%Y-%m-%d", __import__("time").gmtime(__import__("time").time() + 8 * 3600))).replace("-", "")
           with open(os.environ["GITHUB_OUTPUT"], "a") as f:
               f.write("skip=%s\n" % ("true" if skip else "false"))
               f.write("reason=%s\n" % reason)
