@@ -7,11 +7,12 @@ Pipeline: data json + news json + CONTEXT.md + report_helpers blocks
 
 Usage:
     python scripts/gen_report_cloud.py <market us|tw> <data.json> <news.json> \
-        [--out-dir DIR] [--model openai/gpt-4o] [--max-news 18]
+        [--out-dir DIR] [--model MODEL] [--max-news 18]
 
-Env: GH_MODELS_TOKEN (fine-grained PAT with Models:Read). Default output goes to
-reports/<market>/<session_date>/index.html; --out-dir overrides for testing.
-Prints a single-line JSON verdict.
+Env: LLM_API_TOKEN (API key for the OpenAI-compatible endpoint), optional
+LLM_BASE_URL / LLM_MODEL (defaults: Zhipu bigmodel.cn, glm-4.6). Default output
+goes to reports/<market>/<session_date>/index.html; --out-dir overrides for
+testing. Prints a single-line JSON verdict.
 """
 import json
 import os
@@ -24,7 +25,9 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from report_helpers import cards_html, fmt, quote_table_html, sparkline_html  # noqa: E402
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-ENDPOINT = "https://models.github.ai/inference/chat/completions"
+# OpenAI-compatible endpoint; default is Zhipu bigmodel.cn (GLM). Override via env.
+ENDPOINT = os.environ.get("LLM_BASE_URL", "https://open.bigmodel.cn/api/paas/v4/chat/completions")
+DEFAULT_MODEL = os.environ.get("LLM_MODEL", "glm-4.6")
 
 CARDS_SPECS = {
     "us": [("^GSPC", "S&P 500", "GSPC"), ("^IXIC", "Nasdaq Composite", "IXIC"), ("^SOX", "費城半導體", "SOX")],
@@ -149,7 +152,7 @@ def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     market, data_path, news_path = args[0], args[1], args[2]
     out_dir = None
-    model = "openai/gpt-4o"
+    model = DEFAULT_MODEL
     max_news = 18
     for i, a in enumerate(sys.argv):
         if a == "--out-dir" and i + 1 < len(sys.argv):
@@ -158,9 +161,9 @@ def main():
             model = sys.argv[i + 1]
         if a == "--max-news" and i + 1 < len(sys.argv):
             max_news = int(sys.argv[i + 1])
-    token = os.environ.get("GH_MODELS_TOKEN", "").strip()
+    token = os.environ.get("LLM_API_TOKEN", "").strip()
     if not token:
-        print(json.dumps({"ok": False, "error": "GH_MODELS_TOKEN not set or empty"}))
+        print(json.dumps({"ok": False, "error": "LLM_API_TOKEN not set or empty"}))
         sys.exit(1)
 
     with open(data_path, encoding="utf-8") as f:

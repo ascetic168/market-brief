@@ -93,10 +93,12 @@ jobs:
           EOF
           echo "DRY RUN complete — data + news OK from runner, LLM/push skipped."
 
-      - name: Generate report (GitHub Models)
+      - name: Generate report (LLM)
         if: "!inputs.dry_run && steps.guard.outputs.skip != 'true' && steps.gate.outputs.skip != 'true'"
         env:
-          GH_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
+          LLM_API_TOKEN: ${{ secrets.LLM_API_TOKEN }}
+          LLM_BASE_URL: https://open.bigmodel.cn/api/paas/v4/chat/completions
+          LLM_MODEL: ${{ vars.LLM_MODEL || 'glm-4.6' }}
         run: |
           python scripts/gen_report_cloud.py us "${{ steps.gate.outputs.data_file }}" "${{ steps.gate.outputs.news_file }}"
 

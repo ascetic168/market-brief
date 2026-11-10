@@ -10,6 +10,8 @@ jobs:
   smoke:
     runs-on: ubuntu-latest
     timeout-minutes: 15
+    env:
+      LLM_BASE_URL: https://open.bigmodel.cn/api/paas/v4/chat/completions
     steps:
       - uses: actions/checkout@v4
 
@@ -17,26 +19,32 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Probe 0 — GH_MODELS_TOKEN + chat endpoint (5-token ping)
+      - name: Probe 0 — LLM_API_TOKEN + endpoint + model discovery
+        id: probe0
         env:
-          GH_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
+          LLM_API_TOKEN: ${{ secrets.LLM_API_TOKEN }}
         run: |
-          if [ -z "$GH_MODELS_TOKEN" ]; then
-            echo "::error::GH_MODELS_TOKEN is EMPTY — re-set the secret (paste the PAT when prompted)"
+          if [ -z "$LLM_API_TOKEN" ]; then
+            echo "::error::LLM_API_TOKEN is EMPTY — set the secret first (gh secret set LLM_API_TOKEN)"
             exit 1
           fi
-          CODE=$(curl -s -o /tmp/chat.json -w "%{http_code}" \
-            -H "Authorization: Bearer $GH_MODELS_TOKEN" \
-            -H "Content-Type: application/json" \
-            -d '{"model":"openai/gpt-4o-mini","messages":[{"role":"user","content":"ping"}],"max_tokens":5}' \
-            https://models.github.ai/inference/chat/completions)
-          echo "chat endpoint HTTP $CODE"
-          if [ "$CODE" != "200" ]; then
-            echo "::error::token/endpoint rejected (HTTP $CODE) — check PAT has Models:Read"
-            head -c 400 /tmp/chat.json
+          FOUND=""
+          for M in glm-5.3 glm-5 glm-4.6 glm-4.5 glm-4.5-air glm-4-flash; do
+            CODE=$(curl -s -o /tmp/chat.json -w "%{http_code}" \
+              -H "Authorization: Bearer $LLM_API_TOKEN" \
+              -H "Content-Type: application/json" \
+              -d "{\"model\":\"$M\",\"messages\":[{\"role\":\"user\",\"content\":\"ping\"}],\"max_tokens\":5}" \
+              "$LLM_BASE_URL")
+            echo "model $M -> HTTP $CODE"
+            if [ "$CODE" = "200" ]; then FOUND="$M"; break; fi
+            head -c 200 /tmp/chat.json; echo
+          done
+          if [ -z "$FOUND" ]; then
+            echo "::error::no working model on this key/endpoint"
             exit 1
           fi
-          python -c "import json;d=json.load(open('/tmp/chat.json'));print('LLM replied:',d['choices'][0]['message']['content'][:40])"
+          echo "WORKING_MODEL=$FOUND" >> "$GITHUB_OUTPUT"
+          echo "confirmed model: $FOUND"
 
       - name: Probe 1 — Yahoo Finance from runner
         run: python scripts/fetch_us.py
@@ -44,9 +52,10 @@ jobs:
       - name: Probe 2 — news sources from runner
         run: python scripts/fetch_news.py us
 
-      - name: Probe 3 — GitHub Models full generation to /tmp
+      - name: Probe 3 — full generation to /tmp
         env:
-          GH_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
+          LLM_API_TOKEN: ${{ secrets.LLM_API_TOKEN }}
+          LLM_MODEL: ${{ steps.probe0.outputs.WORKING_MODEL }}
         run: |
           python scripts/gen_report_cloud.py us data/us_20261109.json data/news_us_20261110.json --out-dir /tmp/smoke
 
