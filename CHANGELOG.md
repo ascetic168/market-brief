@@ -4,6 +4,38 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.0] - 2026-11-10
+
+### Added
+
+- Fully cloud-hosted automation on GitHub Actions — no local machine required.
+  Two scheduled workflows generate and publish reports: TW Mon–Fri 13:43,
+  US Tue–Sat 05:33 Taipei time (deliberately off the hour to avoid the
+  documented schedule-peak delays).
+- Same-day news research without API keys (`fetch_news.py`): Google News RSS
+  backbone, Bing News RSS redundancy, publisher feeds (LTN / CNBC /
+  MarketWatch), dedupe + 40h window + keyword relevance ranking, plus one
+  dynamic query derived from the day's top movers.
+- `CONTEXT.md`: distilled series context (market regime, analyst frameworks,
+  TW support-level table, writing discipline) consumed by any generator.
+- `gen_report_cloud.py`: the LLM writes only the narrative JSON; Python
+  deterministically assembles HTML from the shared template and report
+  helpers, so quotes/tables/sparklines are always data-exact.
+- Workflow safety rails: Taipei-time close guards, idempotent trading-day
+  gating (holidays/weekends skip silently), dry-run and force inputs for
+  debugging, and automatic `automation-failure` issues on any failure.
+- `smoke.yml` one-shot diagnostic: endpoint probe, model discovery, full
+  generation into /tmp without publishing.
+
+### Changed
+
+- LLM provider: GitHub Models was retired by GitHub on 2026-07-30; switched
+  to the Zhipu bigmodel coding endpoint (`/api/coding/paas/v4`) with
+  `glm-5.3-flash` (thinking disabled — reasoning was consuming the entire
+  completion budget). SSE streaming with plain-JSON fallback parsing.
+- Local ZCode schedules retired; repo documentation consolidated into
+  `AUTOMATION.md`.
+
 ## [0.1.1] - 2026-11-10
 
 ### Fixed
