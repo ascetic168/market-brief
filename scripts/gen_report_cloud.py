@@ -127,23 +127,47 @@ WATCH_EXTRA = {
 }
 
 
-def call_llm(token, model, system, user, timeout=150):
+def call_llm(token, model, system, user, timeout=300):
+    """Streamed chat completion (SSE). Streaming keeps bytes flowing so CI
+    networks don't cut the connection during long generations. Returns
+    (parsed_json_content, usage)."""
     body = json.dumps({
         "model": model,
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
         "temperature": 0.4,
         "max_tokens": 4000,
         "response_format": {"type": "json_object"},
+        "stream": True,
+        "stream_options": {"include_usage": True},
     }).encode("utf-8")
     req = urllib.request.Request(ENDPOINT, data=body, method="POST", headers={
         "Authorization": "Bearer %s" % token,
         "Content-Type": "application/json",
+        "Accept": "text/event-stream",
         "User-Agent": "market-brief-pipeline",
     })
+    content_parts, usage = [], {}
     with urllib.request.urlopen(req, timeout=timeout) as r:
-        out = json.load(r)
-    content = out["choices"][0]["message"]["content"]
-    usage = out.get("usage", {})
+        for raw in r:
+            line = raw.decode("utf-8", "ignore").strip()
+            if not line.startswith("data:"):
+                continue
+            payload = line[5:].strip()
+            if payload == "[DONE]":
+                break
+            try:
+                chunk = json.loads(payload)
+            except json.JSONDecodeError:
+                continue
+            if chunk.get("usage"):
+                usage = chunk["usage"]
+            for ch in chunk.get("choices") or []:
+                delta = (ch.get("delta") or {}).get("content")
+                if delta:
+                    content_parts.append(delta)
+    content = "".join(content_parts)
+    if not content:
+        raise RuntimeError("stream completed but no content received")
     content = re.sub(r"^```(json)?|```$", "", content.strip(), flags=re.M).strip()
     return json.loads(content), usage
 
@@ -186,6 +210,7 @@ def main():
     result, usage, last_err = None, None, None
     for attempt in (1, 2):
         try:
+            t0 = time.time()
             result, usage = call_llm(token, model, system, user)
             break
         except urllib.error.HTTPError as e:
@@ -194,8 +219,13 @@ def main():
                 time.sleep(20)
                 continue
             break
+        except json.JSONDecodeError as e:
+            last_err = "model output not valid JSON (%s)" % e
+            if attempt == 1:
+                time.sleep(5)
+            continue
         except Exception as e:  # noqa: BLE001
-            last_err = str(e)[:200]
+            last_err = "%s: %s" % (type(e).__name__, str(e)[:200])
             if attempt == 1:
                 time.sleep(5)
     if result is None:
