@@ -59,16 +59,17 @@ def cards_html(items):
 
 def quote_table_html(rows, caption, extra_col=None):
     """rows: list of (name, sym, group, record, extra_note).
-    extra_col: optional header for a trailing annotation column (e.g. 成交量)."""
+    extra_col: optional header for a trailing volume column; when given the
+    cell shows the record volume and extra_note annotates inline after pct
+    (e.g. 漲停). Without it extra_note still annotates inline and no trailing
+    column is emitted."""
     has_extra = extra_col is not None
     head = "<tr><th>標的</th><th>類別</th><th>收盤</th><th>漲跌幅</th><th>漲跌</th><th>全日區間</th>%s</tr>" % (
         "<th>%s</th>" % extra_col if has_extra else "")
     body = []
     for name, sym, group, rec, extra in rows:
         c = pct_col(rec.get("pct"))
-        note = extra if extra else ""
-        if has_extra:
-            note = fmt_vol(rec.get("volume")) + (("　" + extra) if extra else "")
+        inline = ("　" + extra) if extra else ""
         body.append("""
       <tr>
         <td class="c-name">%s<span class="c-sym">%s</span></td>
@@ -76,11 +77,10 @@ def quote_table_html(rows, caption, extra_col=None):
         <td class="c-num">%s</td>
         <td class="c-num" style="color:%s"><span style="white-space:nowrap"><b>%+.2f%%</b>%s</span></td>
         <td class="c-num" style="color:%s">%+.2f</td>
-        <td class="c-num">%s – %s</td>
-        <td class="c-num">%s</td>
+        <td class="c-num">%s – %s</td>%s
       </tr>""" % (name, sym, group, fmt(rec.get("close")), c, rec.get("pct") or 0,
-                  ("　" + extra) if (extra and not has_extra) else "",
-                  c, rec.get("chg") or 0, fmt(rec.get("day_low")), fmt(rec.get("day_high")), note))
+                  inline, c, rec.get("chg") or 0, fmt(rec.get("day_low")), fmt(rec.get("day_high")),
+                  ('\n        <td class="c-num">%s</td>' % fmt_vol(rec.get("volume"))) if has_extra else ""))
     return """
   <table>
     <thead>%s</thead>

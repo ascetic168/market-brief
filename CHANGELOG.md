@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.1.1] - 2026-11-10
+
+### Fixed
+
+- `report_helpers.quote_table_html`: emit the trailing volume cell only when
+  `extra_col` is given — previously a stray empty `<td>` misaligned rows
+  against the 6-column header in no-volume mode. Verified all three call
+  modes (no extra column / inline note / volume column) produce matching
+  header-row column counts.
+
 ## [0.1.0] - 2026-11-10
 
 ### Added
