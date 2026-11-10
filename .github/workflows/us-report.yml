@@ -2,7 +2,8 @@ name: US closing report
 
 on:
   schedule:
-    - cron: "33 21 * * 2-6"   # 05:33 Taipei Tue-Sat (US closes 16:00 ET = 04:00/05:00 Taipei)
+    - cron: "33 21 * * 2-6"   # 05:33 Taipei primary (US closes 16:00 ET = 04:00/05:00 Taipei)
+    - cron: "3 22 * * 2-6"    # 06:03 Taipei catch-up (GitHub scheduler delay/drop resilience)
   workflow_dispatch:
     inputs:
       dry_run:

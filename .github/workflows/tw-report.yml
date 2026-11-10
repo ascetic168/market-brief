@@ -2,7 +2,8 @@ name: TW closing report
 
 on:
   schedule:
-    - cron: "43 5 * * 1-5"   # 13:43 Taipei, Mon-Fri (TW market closes 13:30)
+    - cron: "43 5 * * 1-5"   # 13:43 Taipei primary (TW market closes 13:30)
+    - cron: "13 6 * * 1-5"   # 14:13 Taipei catch-up (GitHub scheduler drops runs under load; idempotent gate makes doubles harmless)
   workflow_dispatch:
     inputs:
       dry_run:
