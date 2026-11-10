@@ -128,9 +128,9 @@ WATCH_EXTRA = {
 
 
 def call_llm(token, model, system, user, timeout=300):
-    """Streamed chat completion (SSE). Streaming keeps bytes flowing so CI
-    networks don't cut the connection during long generations. Returns
-    (parsed_json_content, usage)."""
+    """Chat completion handling BOTH SSE streaming and plain-JSON responses
+    (some gateways ignore the stream flag). Raises with a body preview when
+    nothing usable comes back. Returns (parsed_json_content, usage)."""
     body = json.dumps({
         "model": model,
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
@@ -146,10 +146,17 @@ def call_llm(token, model, system, user, timeout=300):
         "Accept": "text/event-stream",
         "User-Agent": "market-brief-pipeline",
     })
-    content_parts, usage = [], {}
     with urllib.request.urlopen(req, timeout=timeout) as r:
-        for raw in r:
-            line = raw.decode("utf-8", "ignore").strip()
+        raw = r.read().decode("utf-8", "ignore")
+
+    def _strip_fence(s):
+        return re.sub(r"^```(json)?|```$", "", s.strip(), flags=re.M).strip()
+
+    content, usage = "", {}
+    if "data:" in raw:
+        # SSE path
+        for line in raw.splitlines():
+            line = line.strip()
             if not line.startswith("data:"):
                 continue
             payload = line[5:].strip()
@@ -159,17 +166,28 @@ def call_llm(token, model, system, user, timeout=300):
                 chunk = json.loads(payload)
             except json.JSONDecodeError:
                 continue
+            if chunk.get("error"):
+                raise RuntimeError("API error in stream: %s" % json.dumps(chunk["error"], ensure_ascii=False)[:300])
             if chunk.get("usage"):
                 usage = chunk["usage"]
             for ch in chunk.get("choices") or []:
                 delta = (ch.get("delta") or {}).get("content")
                 if delta:
-                    content_parts.append(delta)
-    content = "".join(content_parts)
+                    content += delta
+    else:
+        # plain JSON path
+        try:
+            out = json.loads(raw)
+        except json.JSONDecodeError:
+            raise RuntimeError("unparseable response, first 300 chars: %r" % raw[:300])
+        if out.get("error"):
+            raise RuntimeError("API error: %s" % json.dumps(out["error"], ensure_ascii=False)[:300])
+        usage = out.get("usage", {})
+        content = ((out.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
+
     if not content:
-        raise RuntimeError("stream completed but no content received")
-    content = re.sub(r"^```(json)?|```$", "", content.strip(), flags=re.M).strip()
-    return json.loads(content), usage
+        raise RuntimeError("no content in response, first 300 chars: %r" % raw[:300])
+    return json.loads(_strip_fence(content)), usage
 
 
 def main():
