@@ -1,0 +1,129 @@
+name: US closing report
+
+on:
+  schedule:
+    - cron: "33 21 * * 2-6"   # 05:33 Taipei Tue-Sat (US closes 16:00 ET = 04:00/05:00 Taipei)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Fetch data + news only (no LLM, no push)"
+        type: boolean
+        default: false
+      force:
+        description: "Bypass the Taipei-time close guard (debug only)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: us-report
+  cancel-in-progress: false
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Taipei-time close guard
+        id: guard
+        run: |
+          python - <<'EOF'
+          import datetime, os
+          force = "${{ inputs.force }}" == "true"
+          now = datetime.datetime.utcnow() + datetime.timedelta(hours=8)
+          skip, reason = "false", ""
+          if not force:
+              # US close in Taipei: 04:00 (DST) / 05:00 (winter). Require >= 05:10.
+              if now.time() < datetime.time(5, 10):
+                  skip, reason = "true", "US market not closed yet (before 05:10 Taipei)"
+              elif now.weekday() == 6:
+                  skip, reason = "true", "Sunday Taipei (no US session expected)"
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write("skip=%s\n" % skip)
+              f.write("reason=%s\n" % reason)
+          print("guard: skip=%s reason=%s now=%s" % (skip, reason, now))
+          EOF
+
+      - name: Fetch US quotes
+        if: steps.guard.outputs.skip != 'true'
+        id: fetch
+        run: python scripts/fetch_us.py | tee /tmp/verdict.txt
+
+      - name: Gate on trading-day verdict
+        if: steps.guard.outputs.skip != 'true'
+        id: gate
+        run: |
+          python - <<'EOF'
+          import json, os, time
+          verdict = json.loads(open("/tmp/verdict.txt").read().strip().splitlines()[-1])
+          skip = (not verdict.get("ok")) or verdict.get("report_exists")
+          reason = verdict.get("reason") or ("report_exists for %s" % verdict.get("session_date") if verdict.get("report_exists") else "")
+          today = time.strftime("%Y%m%d", time.gmtime(time.time() + 8 * 3600))
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write("skip=%s\n" % ("true" if skip else "false"))
+              f.write("reason=%s\n" % reason)
+              f.write("session_date=%s\n" % verdict.get("session_date", ""))
+              f.write("data_file=%s\n" % verdict.get("output", ""))
+              f.write("news_file=data/news_us_%s.json\n" % today)
+          print("gate: skip=%s reason=%s" % (skip, reason))
+          EOF
+
+      - name: Fetch news (Google News RSS + Bing + CNBC/MarketWatch)
+        if: steps.guard.outputs.skip != 'true' && (steps.gate.outputs.skip != 'true' || inputs.dry_run)
+        run: python scripts/fetch_news.py us
+
+      - name: Dry-run summary
+        if: inputs.dry_run && steps.gate.outputs.skip != 'true'
+        run: |
+          python - <<'EOF'
+          import json
+          d = json.load(open("${{ steps.gate.outputs.news_file }}"))
+          print("news items: %d" % len(d["items"]))
+          for i in d["items"][:8]:
+              print(" -", i["title"][:60], "（%s）" % i["source"])
+          EOF
+          echo "DRY RUN complete — data + news OK from runner, LLM/push skipped."
+
+      - name: Generate report (GitHub Models)
+        if: "!inputs.dry_run && steps.guard.outputs.skip != 'true' && steps.gate.outputs.skip != 'true'"
+        env:
+          GH_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
+        run: |
+          python scripts/gen_report_cloud.py us "${{ steps.gate.outputs.data_file }}" "${{ steps.gate.outputs.news_file }}"
+
+      - name: Update manifest
+        if: "!inputs.dry_run && steps.guard.outputs.skip != 'true' && steps.gate.outputs.skip != 'true'"
+        run: python scripts/update_manifest.py 150
+
+      - name: Commit and push
+        if: "!inputs.dry_run && steps.guard.outputs.skip != 'true' && steps.gate.outputs.skip != 'true'"
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports data manifest.json
+          git diff --cached --stat
+          git commit -m "docs(us): add US market report ${{ steps.gate.outputs.session_date }}" || echo "nothing to commit"
+          git push
+
+      - name: Open issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `automation failure: US closing report`;
+            const body = `Run failed: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\nCheck the logs; the local machine is no longer a fallback.`;
+            const existing = await github.rest.issues.listForRepo({...context.repo, state: "open", labels: "automation-failure"});
+            if (existing.data.some(i => i.title === title)) {
+              await github.rest.issues.createComment({...context.repo, issue_number: existing.data.find(i => i.title === title).number, body});
+            } else {
+              await github.rest.issues.create({...context.repo, title, body, labels: ["automation-failure"]});
+            }
