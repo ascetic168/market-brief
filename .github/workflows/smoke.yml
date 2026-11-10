@@ -34,7 +34,7 @@ jobs:
             head -c 300 /tmp/models.json
             exit 1
           fi
-          python -c "import json;d=json.load(open('/tmp/models.json'));print('models visible:',len(d.get('data',[])))"
+          python -c "import json;d=json.load(open('/tmp/models.json'));m=d.get('data') if isinstance(d,dict) else d;print('models visible:',len(m))"
 
       - name: Probe 1 — Yahoo Finance from runner
         run: python scripts/fetch_us.py
