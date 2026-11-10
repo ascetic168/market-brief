@@ -27,7 +27,7 @@ from report_helpers import cards_html, fmt, quote_table_html, sparkline_html  # 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # OpenAI-compatible endpoint; default is Zhipu bigmodel.cn (GLM). Override via env.
 ENDPOINT = os.environ.get("LLM_BASE_URL", "https://open.bigmodel.cn/api/paas/v4/chat/completions")
-DEFAULT_MODEL = os.environ.get("LLM_MODEL", "glm-4.6")
+DEFAULT_MODEL = os.environ.get("LLM_MODEL", "glm-5.3-flash")
 
 CARDS_SPECS = {
     "us": [("^GSPC", "S&P 500", "GSPC"), ("^IXIC", "Nasdaq Composite", "IXIC"), ("^SOX", "費城半導體", "SOX")],
