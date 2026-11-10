@@ -135,8 +135,9 @@ def call_llm(token, model, system, user, timeout=300):
         "model": model,
         "messages": [{"role": "system", "content": system}, {"role": "user", "content": user}],
         "temperature": 0.4,
-        "max_tokens": 4000,
+        "max_tokens": 6000,
         "response_format": {"type": "json_object"},
+        "thinking": {"type": "disabled"},
         "stream": True,
         "stream_options": {"include_usage": True},
     }).encode("utf-8")
@@ -152,7 +153,7 @@ def call_llm(token, model, system, user, timeout=300):
     def _strip_fence(s):
         return re.sub(r"^```(json)?|```$", "", s.strip(), flags=re.M).strip()
 
-    content, usage = "", {}
+    content, usage, reasoning_len = "", {}, 0
     if "data:" in raw:
         # SSE path
         for line in raw.splitlines():
@@ -171,9 +172,11 @@ def call_llm(token, model, system, user, timeout=300):
             if chunk.get("usage"):
                 usage = chunk["usage"]
             for ch in chunk.get("choices") or []:
-                delta = (ch.get("delta") or {}).get("content")
-                if delta:
-                    content += delta
+                delta = ch.get("delta") or {}
+                if delta.get("content"):
+                    content += delta["content"]
+                if delta.get("reasoning_content"):
+                    reasoning_len += len(delta["reasoning_content"])
     else:
         # plain JSON path
         try:
@@ -183,10 +186,13 @@ def call_llm(token, model, system, user, timeout=300):
         if out.get("error"):
             raise RuntimeError("API error: %s" % json.dumps(out["error"], ensure_ascii=False)[:300])
         usage = out.get("usage", {})
-        content = ((out.get("choices") or [{}])[0].get("message") or {}).get("content") or ""
+        msg = ((out.get("choices") or [{}])[0].get("message") or {})
+        content = msg.get("content") or ""
+        reasoning_len = len(msg.get("reasoning_content") or "")
 
     if not content:
-        raise RuntimeError("no content in response, first 300 chars: %r" % raw[:300])
+        raise RuntimeError("no content in response (reasoning_only=%d chars, completion_tokens=%s), first 300 chars: %r" % (
+            reasoning_len, usage.get("completion_tokens"), raw[:300]))
     return json.loads(_strip_fence(content)), usage
 
 
