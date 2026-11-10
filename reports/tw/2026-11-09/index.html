@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>台股收盤報告：政策護盤下的 V 型反彈（2026-11-09）</title>
+<meta name="author" content="Z.ai"/>
+<style>
+  :root{
+    --primary:#496573; --accent:#a22c40; --text:#151617; --muted:#757c7f;
+    --bg:#f4f5f5; --card:#ffffff; --stripe:#eaeced; --border:#c7d3d9;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:0;background:var(--bg);color:var(--text);
+       font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
+       font-size:16px;line-height:1.7}
+  .wrap{max-width:960px;margin:0 auto;padding:28px 20px 60px}
+  header{border-bottom:3px solid var(--primary);padding-bottom:14px;margin-bottom:22px}
+  .kicker{color:var(--muted);font-size:.85rem;letter-spacing:.25em;font-weight:600}
+  h1{font-size:1.9rem;margin:.2em 0 .3em;color:var(--primary);line-height:1.3}
+  .meta{color:var(--muted);font-size:.9rem}
+  .summary{background:var(--card);border-left:5px solid var(--accent);padding:14px 18px;
+           margin:18px 0 8px;font-size:1rem}
+  section{margin-top:34px}
+  h2{font-size:1.3rem;color:var(--primary);border-left:5px solid var(--primary);
+     padding-left:10px;margin:0 0 12px}
+  p{margin:.5em 0}
+  .cards{display:flex;gap:14px;flex-wrap:wrap}
+  .card{flex:1 1 220px;background:var(--card);border:1px solid var(--border);
+        border-top:4px solid var(--primary);padding:14px 16px;text-align:center}
+  .card-label{color:var(--muted);font-size:.9rem;font-weight:600}
+  .card-sym{color:var(--muted);font-size:.78rem;font-weight:400;margin-left:6px}
+  .card-num{font-size:1.85rem;font-weight:700;color:var(--text);margin:.1em 0}
+  .card-chg{font-size:1.05rem;font-weight:700}
+  .card-range{color:var(--muted);font-size:.8rem;margin-top:.3em}
+  table{width:100%;border-collapse:collapse;background:var(--card);margin:10px 0 4px;
+        font-size:.95rem}
+  th{background:var(--primary);color:#fff;padding:9px 10px;font-weight:600;text-align:center}
+  td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+  tbody tr:nth-child(even){background:var(--stripe)}
+  .c-name{font-weight:700}
+  .c-sym{color:var(--muted);font-size:.8rem;font-weight:400;margin-left:8px}
+  .c-group{color:var(--muted);font-size:.85rem;text-align:center}
+  .c-num{text-align:right;font-variant-numeric:tabular-nums}
+  .caption{color:var(--muted);font-size:.82rem;text-align:center;margin:4px 0 0}
+  .sparks{display:grid;grid-template-columns:1fr;gap:14px}
+  .spark-card{background:var(--card);border:1px solid var(--border);padding:12px 16px 8px}
+  .spark-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap}
+  .spark-title{font-weight:700;color:var(--primary)}
+  .spark-now{font-size:1.05rem;font-variant-numeric:tabular-nums}
+  svg{width:100%;height:auto;display:block}
+  .svghi{font-size:12px;fill:var(--text);font-weight:700}
+  .svglo{font-size:12px;fill:var(--muted)}
+  .spark-foot{color:var(--muted);font-size:.8rem;margin-top:4px}
+  ul,ol{padding-left:1.4em;margin:.4em 0}
+  li{margin:.45em 0}
+  .up{color:#c0392b}.down{color:#1e7a46}
+  .quotebox{background:var(--card);border-left:4px solid var(--accent);padding:12px 16px;margin:14px 0}
+  .quotebox .attr{color:var(--muted);font-size:.85rem;margin-top:6px}
+  table.stage td:first-child{font-weight:700;white-space:nowrap}
+  table.stage td:nth-child(3){white-space:nowrap}
+  .note{background:var(--stripe);border:1px dashed var(--border);padding:10px 14px;
+        color:var(--muted);font-size:.88rem;margin:12px 0}
+  .src li{font-size:.9rem;color:var(--muted)}
+  .src a{color:var(--primary);word-break:break-all}
+  footer{margin-top:40px;border-top:1px solid var(--border);padding-top:14px;
+         color:var(--muted);font-size:.85rem}
+  @page{size:A4;margin:13mm 11mm}
+  @media print{
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{background:#fff}
+    .wrap{max-width:none;padding:0}
+    section{break-before:page}
+    section.first{break-before:auto}
+    section:last-of-type{break-before:auto}
+    header{break-inside:avoid}
+    .summary{break-inside:avoid}
+    .card,.spark-card,table{break-inside:avoid}
+    .sparks{break-inside:avoid}
+    footer{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">經濟循環研究 · 收盤快報 CLOSING BRIEF</div>
+  <h1>台股收盤報告：政策護盤下的 V 型反彈</h1>
+  <div class="meta">收盤定案：<b>2026-11-09（一）13:30 收盤集合競價</b>（定盤數據 13:33 證交所 MIS 確認）· 資料來源：證交所官方報價＋Yahoo Finance 盤中序列</div>
+  <div class="summary">
+    <b>一句話結論：</b>上週五（11/6）大盤崩跌 <b class="down">-4.51%</b>、國安基金當日授權史上第 10 次護盤、金管會限空令今日生效，加上美股費半 <b class="up">+4.21%</b>、台積電 ADR <b class="up">+6.33%</b> 的跌深反彈——<b>政策托底＋超賣軋空的三力共振</b>：台股跳空 +1.63% 開出後單邊攻至 <b class="up">+6.67%</b>（42,349.36），<b>開盤價即全日最低</b>；午後高檔換手、尾盤 90 分鐘自然回落 687 點，收 <b>41,661.70（+1,960.06、+4.94%）</b>——<b>完全收復 11/6 全部跌幅並反超 11/5 收盤 87 點</b>。聯發科、台達電、光寶科漲停收盤；唯一收黑僅聯詠 <b class="down">-1.82%</b>。誠實聲明：<b>尾盤未見護盤拉抬指紋</b>（回落而非大單推高），而週末爆發的<b>黃仁勳事件台股並未定價</b>——今晚 22:30 美股開盤才是第一個考場。
+  </div>
+</header>
+
+<section class="first">
+  <h2>一、收盤快照</h2>
+  <div class="cards">
+
+      <div class="card">
+        <div class="card-label">發行量加權指數 <span class="card-sym">TWII</span></div>
+        <div class="card-num">41,661.70</div>
+        <div class="card-chg" style="color:#c0392b">+4.94%　+1960.06</div>
+        <div class="card-range">全日 40,347.28 – 42,349.36</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">台積電 <span class="card-sym">2330</span></div>
+        <div class="card-num">2,235.00</div>
+        <div class="card-chg" style="color:#c0392b">+4.68%　+100.00</div>
+        <div class="card-range">全日 2,190.00 – 2,290.00</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">元大台灣50 <span class="card-sym">0050</span></div>
+        <div class="card-num">97.45</div>
+        <div class="card-chg" style="color:#c0392b">+5.35%　+4.95</div>
+        <div class="card-range">全日 94.50 – 99.00</div>
+      </div>
+  </div>
+  <table>
+    <thead><tr><th>標的</th><th>類別</th><th>收盤</th><th>漲跌幅</th><th>漲跌</th><th>全日區間</th><th>成交量（張）</th></tr></thead>
+    <tbody>
+
+      <tr>
+        <td class="c-name">發行量加權指數<span class="c-sym">TWII</span></td>
+        <td class="c-group">指數</td>
+        <td class="c-num">41,661.70</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+4.94%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+1960.06</td>
+        <td class="c-num">40,347.28 – 42,349.36</td>
+        <td class="c-num">—</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">元大台灣50<span class="c-sym">0050</span></td>
+        <td class="c-group">ETF</td>
+        <td class="c-num">97.45</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+5.35%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+4.95</td>
+        <td class="c-num">94.50 – 99.00</td>
+        <td class="c-num">274,548</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">台積電<span class="c-sym">2330</span></td>
+        <td class="c-group">權值股</td>
+        <td class="c-num">2,235.00</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+4.68%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+100.00</td>
+        <td class="c-num">2,190.00 – 2,290.00</td>
+        <td class="c-num">41,343</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">聯發科<span class="c-sym">2454</span></td>
+        <td class="c-group">權值股</td>
+        <td class="c-num">3,725.00</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+9.88%</b>　漲停</span></td>
+        <td class="c-num" style="color:#c0392b">+335.00</td>
+        <td class="c-num">3,450.00 – 3,725.00</td>
+        <td class="c-num">9,177</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">鴻海<span class="c-sym">2317</span></td>
+        <td class="c-group">權值股</td>
+        <td class="c-num">239.00</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+6.46%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+14.50</td>
+        <td class="c-num">226.50 – 246.00</td>
+        <td class="c-num">47,868</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">台達電<span class="c-sym">2308</span></td>
+        <td class="c-group">權值股</td>
+        <td class="c-num">1,160.00</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+9.95%</b>　漲停</span></td>
+        <td class="c-num" style="color:#c0392b">+105.00</td>
+        <td class="c-num">1,105.00 – 1,160.00</td>
+        <td class="c-num">16,026</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">聯電<span class="c-sym">2303</span></td>
+        <td class="c-group">權值股</td>
+        <td class="c-num">96.70</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+5.11%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+4.70</td>
+        <td class="c-num">92.00 – 100.50</td>
+        <td class="c-num">206,659</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">日月光投控<span class="c-sym">3711</span></td>
+        <td class="c-group">權值股</td>
+        <td class="c-num">561.00</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+6.45%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+34.00</td>
+        <td class="c-num">529.00 – 579.00</td>
+        <td class="c-num">28,996</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">光寶科<span class="c-sym">2301</span></td>
+        <td class="c-group">權值股</td>
+        <td class="c-num">217.50</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+9.85%</b>　漲停</span></td>
+        <td class="c-num" style="color:#c0392b">+19.50</td>
+        <td class="c-num">201.00 – 217.50</td>
+        <td class="c-num">7,859</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">緯創<span class="c-sym">3231</span></td>
+        <td class="c-group">AI／組裝</td>
+        <td class="c-num">168.50</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+5.31%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+8.50</td>
+        <td class="c-num">164.00 – 174.50</td>
+        <td class="c-num">39,413</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">聯詠<span class="c-sym">3034</span></td>
+        <td class="c-group">IC設計</td>
+        <td class="c-num">486.50</td>
+        <td class="c-num" style="color:#1e7a46"><span style="white-space:nowrap"><b>-1.82%</b></span></td>
+        <td class="c-num" style="color:#1e7a46">-9.00</td>
+        <td class="c-num">460.50 – 498.00</td>
+        <td class="c-num">4,995</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="caption">表 1：加權指數與主要權值股收盤行情（顏色採台灣慣例：<span class="up">紅漲</span>／<span class="down">綠跌</span>；成交量為證交所 MIS 盤後定案值）</p>
+</section>
+
+<section>
+  <h2>二、全日走勢</h2>
+  <div class="sparks">
+
+    <div class="spark-card">
+      <div class="spark-head"><span class="spark-title">發行量加權指數 <span class="card-sym">TWII</span></span>
+        <span class="spark-now" style="color:#c0392b">收 41,661.70　<b>+4.94%</b></span></div>
+      <svg viewBox="0 0 700 120" preserveAspectRatio="none" role="img" aria-label="發行量加權指數 全日走勢">
+        <path d="M 10.0 110.0 L 10.0,110.0 22.6,88.5 35.2,89.8 47.8,78.9 60.4,66.8 73.0,59.5 85.6,66.4 98.1,60.5 110.7,50.3 123.3,43.1 135.9,39.1 148.5,36.1 161.1,32.4 173.7,32.3 186.3,34.3 198.9,29.9 211.5,22.1 224.1,14.6 236.7,12.8 249.3,10.0 261.9,18.9 274.4,22.3 287.0,21.9 299.6,19.4 312.2,21.5 324.8,23.7 337.4,27.2 350.0,27.5 362.6,24.7 375.2,26.3 387.8,26.3 400.4,21.6 413.0,21.3 425.6,21.6 438.1,24.7 450.7,21.0 463.3,24.8 475.9,23.0 488.5,24.2 501.1,26.7 513.7,26.6 526.3,26.4 538.9,25.1 551.5,24.8 564.1,25.7 576.7,26.6 589.3,27.9 601.9,35.5 614.4,34.0 627.0,36.0 639.6,39.7 652.2,44.6 664.8,43.0 677.4,39.1 690.0,42.7 L 690.0 110.0 Z" fill="rgba(73,101,117,0.10)" stroke="none"/>
+        <polyline points="10.0,110.0 22.6,88.5 35.2,89.8 47.8,78.9 60.4,66.8 73.0,59.5 85.6,66.4 98.1,60.5 110.7,50.3 123.3,43.1 135.9,39.1 148.5,36.1 161.1,32.4 173.7,32.3 186.3,34.3 198.9,29.9 211.5,22.1 224.1,14.6 236.7,12.8 249.3,10.0 261.9,18.9 274.4,22.3 287.0,21.9 299.6,19.4 312.2,21.5 324.8,23.7 337.4,27.2 350.0,27.5 362.6,24.7 375.2,26.3 387.8,26.3 400.4,21.6 413.0,21.3 425.6,21.6 438.1,24.7 450.7,21.0 463.3,24.8 475.9,23.0 488.5,24.2 501.1,26.7 513.7,26.6 526.3,26.4 538.9,25.1 551.5,24.8 564.1,25.7 576.7,26.6 589.3,27.9 601.9,35.5 614.4,34.0 627.0,36.0 639.6,39.7 652.2,44.6 664.8,43.0 677.4,39.1 690.0,42.7" fill="none" stroke="#496573" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="690.0" cy="42.7" r="4" fill="#c0392b"/>
+        <text x="10" y="13" class="svghi">42,301.26</text>
+        <text x="10" y="118" class="svglo">40,347.28</text>
+      </svg>
+      <div class="spark-foot">全日 5 分鐘序列＋開盤／收盤集合競價定盤（09:00–13:30 台北）· 全日區間 40,347.28 – 42,349.36</div>
+    </div>
+
+    <div class="spark-card">
+      <div class="spark-head"><span class="spark-title">台積電 <span class="card-sym">2330</span></span>
+        <span class="spark-now" style="color:#c0392b">收 2,235.00　<b>+4.68%</b></span></div>
+      <svg viewBox="0 0 700 120" preserveAspectRatio="none" role="img" aria-label="台積電 全日走勢">
+        <path d="M 10.0 110.0 L 10.0,93.3 22.6,98.9 35.2,110.0 47.8,98.9 60.4,98.9 73.0,87.8 85.6,93.3 98.1,93.3 110.7,71.1 123.3,60.0 135.9,54.4 148.5,54.4 161.1,43.3 173.7,43.3 186.3,43.3 198.9,43.3 211.5,32.2 224.1,21.1 236.7,15.6 249.3,10.0 261.9,26.7 274.4,26.7 287.0,21.1 299.6,21.1 312.2,26.7 324.8,32.2 337.4,37.8 350.0,37.8 362.6,32.2 375.2,43.3 387.8,32.2 400.4,32.2 413.0,32.2 425.6,32.2 438.1,37.8 450.7,32.2 463.3,37.8 475.9,32.2 488.5,32.2 501.1,37.8 513.7,37.8 526.3,37.8 538.9,37.8 551.5,37.8 564.1,37.8 576.7,37.8 589.3,43.3 601.9,54.4 614.4,48.9 627.0,48.9 639.6,60.0 652.2,71.1 664.8,76.7 677.4,60.0 690.0,65.6 L 690.0 110.0 Z" fill="rgba(73,101,117,0.10)" stroke="none"/>
+        <polyline points="10.0,93.3 22.6,98.9 35.2,110.0 47.8,98.9 60.4,98.9 73.0,87.8 85.6,93.3 98.1,93.3 110.7,71.1 123.3,60.0 135.9,54.4 148.5,54.4 161.1,43.3 173.7,43.3 186.3,43.3 198.9,43.3 211.5,32.2 224.1,21.1 236.7,15.6 249.3,10.0 261.9,26.7 274.4,26.7 287.0,21.1 299.6,21.1 312.2,26.7 324.8,32.2 337.4,37.8 350.0,37.8 362.6,32.2 375.2,43.3 387.8,32.2 400.4,32.2 413.0,32.2 425.6,32.2 438.1,37.8 450.7,32.2 463.3,37.8 475.9,32.2 488.5,32.2 501.1,37.8 513.7,37.8 526.3,37.8 538.9,37.8 551.5,37.8 564.1,37.8 576.7,37.8 589.3,43.3 601.9,54.4 614.4,48.9 627.0,48.9 639.6,60.0 652.2,71.1 664.8,76.7 677.4,60.0 690.0,65.6" fill="none" stroke="#496573" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="690.0" cy="65.6" r="4" fill="#c0392b"/>
+        <text x="10" y="13" class="svghi">2,285.00</text>
+        <text x="10" y="118" class="svglo">2,195.00</text>
+      </svg>
+      <div class="spark-foot">全日 5 分鐘序列＋開盤／收盤集合競價定盤（09:00–13:30 台北）· 全日區間 2,190.00 – 2,290.00</div>
+    </div>
+
+    <div class="spark-card">
+      <div class="spark-head"><span class="spark-title">聯發科 <span class="card-sym">2454</span></span>
+        <span class="spark-now" style="color:#c0392b">收 3,725.00　<b>+9.88%</b></span></div>
+      <svg viewBox="0 0 700 120" preserveAspectRatio="none" role="img" aria-label="聯發科 全日走勢">
+        <path d="M 10.0 110.0 L 10.0,87.6 22.6,110.0 35.2,83.5 47.8,85.5 60.4,69.2 73.0,69.2 85.6,73.3 98.1,69.2 110.7,56.9 123.3,50.8 135.9,36.5 148.5,26.3 161.1,24.3 173.7,28.4 186.3,22.2 198.9,16.1 211.5,10.0 224.1,10.0 236.7,10.0 249.3,10.0 261.9,10.0 274.4,10.0 287.0,10.0 299.6,10.0 312.2,10.0 324.8,10.0 337.4,10.0 350.0,10.0 362.6,10.0 375.2,10.0 387.8,10.0 400.4,10.0 413.0,10.0 425.6,10.0 438.1,10.0 450.7,10.0 463.3,10.0 475.9,10.0 488.5,10.0 501.1,10.0 513.7,10.0 526.3,10.0 538.9,10.0 551.5,10.0 564.1,10.0 576.7,10.0 589.3,10.0 601.9,10.0 614.4,10.0 627.0,10.0 639.6,10.0 652.2,10.0 664.8,10.0 677.4,10.0 690.0,10.0 L 690.0 110.0 Z" fill="rgba(73,101,117,0.10)" stroke="none"/>
+        <polyline points="10.0,87.6 22.6,110.0 35.2,83.5 47.8,85.5 60.4,69.2 73.0,69.2 85.6,73.3 98.1,69.2 110.7,56.9 123.3,50.8 135.9,36.5 148.5,26.3 161.1,24.3 173.7,28.4 186.3,22.2 198.9,16.1 211.5,10.0 224.1,10.0 236.7,10.0 249.3,10.0 261.9,10.0 274.4,10.0 287.0,10.0 299.6,10.0 312.2,10.0 324.8,10.0 337.4,10.0 350.0,10.0 362.6,10.0 375.2,10.0 387.8,10.0 400.4,10.0 413.0,10.0 425.6,10.0 438.1,10.0 450.7,10.0 463.3,10.0 475.9,10.0 488.5,10.0 501.1,10.0 513.7,10.0 526.3,10.0 538.9,10.0 551.5,10.0 564.1,10.0 576.7,10.0 589.3,10.0 601.9,10.0 614.4,10.0 627.0,10.0 639.6,10.0 652.2,10.0 664.8,10.0 677.4,10.0 690.0,10.0" fill="none" stroke="#496573" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="690.0" cy="10.0" r="4" fill="#c0392b"/>
+        <text x="10" y="13" class="svghi">3,725.00</text>
+        <text x="10" y="118" class="svglo">3,480.00</text>
+      </svg>
+      <div class="spark-foot">全日 5 分鐘序列＋開盤／收盤集合競價定盤（09:00–13:30 台北）· 全日區間 3,450.00 – 3,725.00</div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <h2>三、收盤解讀：政策性反彈的三個關鍵線索</h2>
+  <ul>
+    <li><b>教科書級的單邊反彈軌跡，但尾盤「自然回落」。</b>跳空 40,347（+1.63%）開出後，09:00–10:36 單邊上攻：09:51 回補 11/6 全部跌幅（41,726）、10:41 摸到 42,349.36（+6.67%）；之後兩波調節（-400、-130 點）都被 41,900 吸收，午盤在 42,000 附近凍結盤整，<b>最後 90 分鐘自高點回落 687 點（-1.62%）</b>，收 +4.94%。回落屬獲利了結性質而非護盤失敗——開盤價全程未再觸及，當日多空分界始終穩固。全日振幅 2,002 點（相當於昨收的 5.0%），為近年罕見的單日波動。</li>
+    <li><b>漲停潮是「多方底氣」，也讓指數略為虛胖。</b>聯發科 3,725、台達電 1,160、光寶科 217.5 <b>三檔權值股漲停鎖收</b>；鴻海 239.0（+6.46%）距漲停僅半檔、全日 4.8 萬張放量。漲停鎖死的買不到盤讓「可交易部分」的退潮被放大檢視——午後聯電自 100.5 高點回落至 96.7、台積電自 2,290 回落至 2,235，均為跟隨股的換手而非漲停組的鬆動。<b>唯一收黑的聯詠（-1.82%）從早盤 -4.6% 收斂</b>，廣度近乎全紅。</li>
+    <li><b>台積電現貨與 ADR 的錨定關係完成一輪「補漲—收斂」。</b>現貨開盤僅 +3.5%（ADR 前夜 +6.33%），盤中最深補至 2,290（+7.03%、<b>反超 ADR</b>），尾盤回落收 2,235（+4.68%）——<b>ADR 溢價重新拉開至約 1.6 個百分點</b>。這是明天開盤的正面錨定，但也暗示今天現貨的追價在 2,290 之上被賣壓封頂。</li>
+  </ul>
+</section>
+
+<section>
+  <h2>四、政策面：史上第 10 次護盤＋限空令（本日反彈的結構性背景）</h2>
+  <ul>
+    <li><b>11/6（五）14:30 國安基金第 131 次臨時委員會</b>：授權執行秘書視盤勢動用最高 <b>5,000 億元</b>進場——史上第 10 度護盤（前次 2022）。觸發背景：11/2–11/6 單週暴跌 5,510 點（-12.19%）、市值一週蒸發約 18 兆、10 月外資賣超 9,943 億創紀錄、11/6 融資單日大減 564 億（史上最大減幅）。</li>
+    <li><b>金管會同日傍晚公布 5 項限空措施，11/9 起生效</b>——今日盤面空方回補、不敢新空的「軋空結構」與此直接相關；融資斷頭壓力也因 11/6 一次出清而緩解。</li>
+    <li><b>誠實聲明：今日尾盤沒有護盤拉抬的指紋。</b>13:25 後指數是自然走低而非大單推高；若護盤資金今日進場，型態更接近盤中托底承接。最終驗證待今晚三大法人數據——<b>自營商買超異常放大（公股行庫自營部下單）</b>是最硬的證據。</li>
+    <li><b>歷史框架</b>：護盤能製造反彈、不等於落底——2022 年第 9 次護盤的路徑是「反彈 → 再探底 → 落底」。對本系列情境矩陣的方向性影響：<b>壓平左尾（快速崩盤情境機率下修）、拉長築底時間軸（上修）</b>；機率值待 11/17 NVDA 財報後統一更新（詳見《量化類比推論報告》附錄事件簿）。</li>
+  </ul>
+</section>
+
+<section>
+  <h2>五、未被今日定價的風險：黃仁勳事件</h2>
+  <ul>
+    <li><b>時間線</b>：11/7《金融時報》報導美國情報單位認定黃仁勳與一名疑似中國情報人員的女性有浪漫關係，眾議院外交／中國／情報三委員會要求其 <b>11/18 閉門說明</b>；11/8 黃仁勳致員工信承認婚外情並致歉，<b>NVIDIA 董事會宣布啟動獨立調查</b>（釐清是否為外國情報行動目標），惟表態仍信任其領導。</li>
+    <li><b>為何台股今天「沒反應」</b>：政策反彈的單邊買盤完全蓋過單一治理事件；且事件衝擊的是 NVIDIA 的 key-man／地緣政治風險，不直接改變台積電、聯發科的訂單簿。微妙痕跡：台積電午後轉弱、收盤再度落後 ADR 約 1.6 個百分點，很難說完全無關（推論，非實證）。</li>
+    <li><b>今晚 22:30 美股開盤才是首個定價時點</b>——NVIDIA 上一次成交（11/6 16:00 美東）在爆料之前。疊加風險：<b>11/17 財報</b>（「capex 地板論」的直接檢驗）與 <b>11/18 國會閉門說明</b>相隔僅一天，雙事件落在財報週；若調查升級（停職／解職具體化），NVDA 單日波動會透過 SOX／Nasdaq 在<b>週三 11/11 台股</b>補課。</li>
+  </ul>
+</section>
+
+<section>
+  <h2>六、本週走勢與階段防線更新</h2>
+  <ul>
+    <li>本週日 K：11/4 收 42,948.91（-358.63）；11/5 收 41,574.72（-1,374.19）；11/6 收 39,701.64（-1,873.08、盤中最低 37,837.05 摜破 4 萬點）；<b>今日收 41,661.70（+1,960.06）——單日收復前三日近半跌幅，指數重新站回 11/5 收盤之上（+87 點），自 10/6 高點 49,968.92 的回檔收斂至 -16.6%</b>。</li>
+    <li>名家觀點的階段防線現況如下（詳見《AI 股市泡沫：名家觀點彙整與結論》第九章）：</li>
+  </ul>
+  <table class="stage">
+    <thead><tr><th>階段</th><th>指數區間</th><th>距高點跌幅</th><th>依據／名家</th></tr></thead>
+    <tbody>
+      <tr><td>① 第一防線</td><td>39,000–40,000</td><td>-20%～-21%</td><td>4 萬整數關＋7 月低點 39,384＋年線——11/6 盤中摜破（37,837）後拉回；今日反彈後<b>收 41,661，回到防線上緣之上約 4.2%</b>，防線暫時解除警報</td></tr>
+      <tr><td>② 第二防線</td><td>36,000–37,000</td><td>-26%～-28%</td><td>杜金龍「36,000 門檻」；61.8% 費波那西回檔（推算）——11/6 低點 37,837 距此不遠</td></tr>
+      <tr><td>③ 第三防線</td><td>30,000–34,000</td><td>-32%～-40%</td><td>謝金河×杜金龍「34,000 點會來嗎」；78.6% 回檔；2026 年起漲區</td></tr>
+      <tr><td>④ 極端熊市</td><td>22,000</td><td>約 -56%</td><td>瑞銀熊市情境（AI 泡沫破裂）；歷史對照 2000 年 -66%、2008 年 -60%</td></tr>
+    </tbody>
+  </table>
+  <p class="caption">表 2：台股階段性支撐／買點（名家觀點彙整，非投資建議）</p>
+  <div class="note">單日 +4.94% 的政策性反彈<b>不構成落底證據</b>：2000、2008、2022 三次熊市中，「護盤宣布後的單日大漲」之後再探底的機率高；除非後續量價確認（外資連續回補、月線翻穩），第一防線之上不宜把今日低點視為本波谷底。</div>
+</section>
+
+<section>
+  <h2>七、觀察清單</h2>
+  <ol>
+    <li><b>今晚（台北 22:30 起）美股</b>：NVIDIA 對黃仁勳事件的首次定價——開盤跳空幅度是 key-man 風險折價的直接讀數；SOX／Nasdaq 同步觀察。</li>
+    <li><b>今晚 ~20:00 證交所三大法人數據</b>：自營商買超是否異常放大（護盤鐵證）、外資是否由連日賣超轉買——「外資仍賣而指數大漲」的話，今日反彈的政策色彩更重。</li>
+    <li><b>明天 11/10 台股</b>：能否站穩 41,000–42,000 並守住今日低點 40,347（跳空缺口 39,701–40,347 若回補即反彈失敗訊號）；漲停組（聯發科／台達電／光寶科）開盤是否鬆動。</li>
+    <li><b>11/17 NVIDIA Q3 財報</b>：營收與資料中心指引——「capex 是地板」的直接檢驗；<b>11/18 國會閉門說明</b>緊接其後。</li>
+    <li><b>12 月 FOMC</b>：升息機率與 10 年期殖利率路徑（4.86% 之後會否走向 5%）。</li>
+    <li><b>外資期貨空單</b>（近 10 萬口）回補進度與 11/28 台灣選舉——杜金龍點名的反攻時間窗。</li>
+  </ol>
+</section>
+
+<section>
+  <h2>八、資料來源</h2>
+  <ul class="src">
+    <li>收盤定案數據：證交所 MIS 即時報價系統（2026-11-09 13:33 定盤確認，13:45 複查穩定）——加權指數收 41,661.70；個股收盤、全日高低與成交量同源</li>
+    <li>盤中 5 分鐘序列：Yahoo Finance Chart API（^TWII、2330.TW、2454.TW 等，收盤後定案）</li>
+    <li>護盤與限空令：經濟日報（<a href="https://money.udn.com/money/story/5607/9862465">money.udn.com/money/story/5607/9862465</a>）、Yahoo 奇摩股市（2026/11/6–11/8）</li>
+    <li>黃仁勳事件：Financial Times（11/7）、紐約時報（11/8）、BBC 中文、NVIDIA 董事會官方聲明〈Statement From NVIDIA Board of Directors〉（11/8）</li>
+    <li>上週日 K 與階段防線：TWSE 官方每日行情（FMTQIK）、名家觀點彙整自《AI 股市泡沫：名家觀點彙整與結論》（2026/11/6）</li>
+  </ul>
+</section>
+
+<footer>
+  本報告為 <b>2026-11-09 收盤定案</b>數據；所引用之點位預測均為公開名家觀點之彙整，<b>不構成投資建議</b>。大盤成交值等官方日統計由證交所於今晚收盤後發布。生成時間：台北時間 11/9。
+</footer>
+
+</div>
+</body>
+</html>
