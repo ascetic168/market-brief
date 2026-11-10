@@ -17,7 +17,7 @@ jobs:
         with:
           python-version: "3.13"
 
-      - name: Probe 0 — GH_MODELS_TOKEN validity
+      - name: Probe 0 — GH_MODELS_TOKEN + chat endpoint (5-token ping)
         env:
           GH_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
         run: |
@@ -25,16 +25,18 @@ jobs:
             echo "::error::GH_MODELS_TOKEN is EMPTY — re-set the secret (paste the PAT when prompted)"
             exit 1
           fi
-          CODE=$(curl -s -o /tmp/models.json -w "%{http_code}" \
+          CODE=$(curl -s -o /tmp/chat.json -w "%{http_code}" \
             -H "Authorization: Bearer $GH_MODELS_TOKEN" \
-            https://models.github.ai/inference/models)
-          echo "models endpoint HTTP $CODE"
+            -H "Content-Type: application/json" \
+            -d '{"model":"openai/gpt-4o-mini","messages":[{"role":"user","content":"ping"}],"max_tokens":5}' \
+            https://models.github.ai/inference/chat/completions)
+          echo "chat endpoint HTTP $CODE"
           if [ "$CODE" != "200" ]; then
-            echo "::error::token rejected (HTTP $CODE) — check the PAT has Models:Read"
-            head -c 300 /tmp/models.json
+            echo "::error::token/endpoint rejected (HTTP $CODE) — check PAT has Models:Read"
+            head -c 400 /tmp/chat.json
             exit 1
           fi
-          python -c "import json;d=json.load(open('/tmp/models.json'));m=d.get('data') if isinstance(d,dict) else d;print('models visible:',len(m))"
+          python -c "import json;d=json.load(open('/tmp/chat.json'));print('LLM replied:',d['choices'][0]['message']['content'][:40])"
 
       - name: Probe 1 — Yahoo Finance from runner
         run: python scripts/fetch_us.py
