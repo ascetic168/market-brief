@@ -158,10 +158,10 @@ def main():
             model = sys.argv[i + 1]
         if a == "--max-news" and i + 1 < len(sys.argv):
             max_news = int(sys.argv[i + 1])
-    token = os.environ.get("GH_MODELS_TOKEN")
+    token = os.environ.get("GH_MODELS_TOKEN", "").strip()
     if not token:
-        print(json.dumps({"ok": False, "error": "GH_MODELS_TOKEN not set"}))
-        sys.exit(0)
+        print(json.dumps({"ok": False, "error": "GH_MODELS_TOKEN not set or empty"}))
+        sys.exit(1)
 
     with open(data_path, encoding="utf-8") as f:
         data = json.load(f)
@@ -197,7 +197,7 @@ def main():
                 time.sleep(5)
     if result is None:
         print(json.dumps({"ok": False, "error": "LLM call failed: %s" % last_err}, ensure_ascii=False))
-        sys.exit(0)
+        sys.exit(1)
 
     sections_html = []
     for i, sec in enumerate(result["sections"]):

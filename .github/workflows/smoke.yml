@@ -17,13 +17,32 @@ jobs:
         with:
           python-version: "3.13"
 
+      - name: Probe 0 — GH_MODELS_TOKEN validity
+        env:
+          GH_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
+        run: |
+          if [ -z "$GH_MODELS_TOKEN" ]; then
+            echo "::error::GH_MODELS_TOKEN is EMPTY — re-set the secret (paste the PAT when prompted)"
+            exit 1
+          fi
+          CODE=$(curl -s -o /tmp/models.json -w "%{http_code}" \
+            -H "Authorization: Bearer $GH_MODELS_TOKEN" \
+            https://models.github.ai/inference/models)
+          echo "models endpoint HTTP $CODE"
+          if [ "$CODE" != "200" ]; then
+            echo "::error::token rejected (HTTP $CODE) — check the PAT has Models:Read"
+            head -c 300 /tmp/models.json
+            exit 1
+          fi
+          python -c "import json;d=json.load(open('/tmp/models.json'));print('models visible:',len(d.get('data',[])))"
+
       - name: Probe 1 — Yahoo Finance from runner
         run: python scripts/fetch_us.py
 
       - name: Probe 2 — news sources from runner
         run: python scripts/fetch_news.py us
 
-      - name: Probe 3 — GitHub Models token + full generation to /tmp
+      - name: Probe 3 — GitHub Models full generation to /tmp
         env:
           GH_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
         run: |
@@ -35,7 +54,7 @@ jobs:
           head -c 1200 /tmp/smoke/index.html
           echo
           echo "--- structure ---"
-          grep -o "<h2>[^<]*</h2>" /tmp/smoke/index.html
+          grep -o "<h2>[^<]*</h2>" /tmp/smoke/index.html || echo "(no h2 found)"
           grep -c "spark-card" /tmp/smoke/index.html || true
           echo "--- size ---"
           wc -c /tmp/smoke/index.html
