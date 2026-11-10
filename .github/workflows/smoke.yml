@@ -1,0 +1,41 @@
+name: Cloud pipeline smoke test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Probe 1 — Yahoo Finance from runner
+        run: python scripts/fetch_us.py
+
+      - name: Probe 2 — news sources from runner
+        run: python scripts/fetch_news.py us
+
+      - name: Probe 3 — GitHub Models token + full generation to /tmp
+        env:
+          GH_MODELS_TOKEN: ${{ secrets.GH_MODELS_TOKEN }}
+        run: |
+          python scripts/gen_report_cloud.py us data/us_20261109.json data/news_us_20261110.json --out-dir /tmp/smoke
+
+      - name: Inspect generated HTML
+        run: |
+          echo "--- head ---"
+          head -c 1200 /tmp/smoke/index.html
+          echo
+          echo "--- structure ---"
+          grep -o "<h2>[^<]*</h2>" /tmp/smoke/index.html
+          grep -c "spark-card" /tmp/smoke/index.html || true
+          echo "--- size ---"
+          wc -c /tmp/smoke/index.html
