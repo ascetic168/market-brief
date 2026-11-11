@@ -4,6 +4,31 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.3] - 2026-11-12
+
+### Fixed
+
+- TW close data is now sourced from TWSE official APIs with Yahoo demoted to
+  last-resort fallback: the index close comes from the FMTQIK daily report
+  (falling back to the MIS snapshot API), stock closes from MIS (falling back
+  to Yahoo); chg/pct are re-derived from the official figures and the
+  intraday-series / daily-close tails are patched to match. Motivation: the
+  published TW 2026-11-11 report carried Yahoo's stale 13:43 snapshot
+  (index 44,029.53 / +2,367.83 vs official 44,257.15 / +1,545.23, TSMC 2,380
+  vs 2,395) — Yahoo's ^TWII previous-close also skipped the 11/10 session.
+  Verified against the 11/11 finals: index/stocks now resolve to the exact
+  official values (index=twse_fmtqik, stocks=twse_mis). TW table caption and
+  the meta_line prompt updated to attribute TWSE as the data source.
+- The existing TW 2026-11-11 report remains as published (historical files
+  are never edited); this fix takes effect from the next run.
+
+### Added
+
+- Site archive pagination: only the latest 30 reports render by default
+  (overridable via `?page=N` for ops checks) with a 載入更多 button; search
+  and market filters always cover the full archive — the cap is display-only,
+  and the result count discloses what is shown.
+
 ## [0.2.2] - 2026-11-12
 
 ### Added

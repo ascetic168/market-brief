@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 """Fetch finalized TW close quotes + intraday 5m series + 1-month daily closes.
 
-Data sources:
-  - Yahoo Finance v8 chart API (^TWII + key stocks; official close, 5m series)
-  - TWSE FMTQIK daily market report (turnover / index; best-effort, may lag on
-    the run day — the report labels it preliminary when today's row is absent)
+Data sources — official first, Yahoo as last resort:
+  - TWSE FMTQIK daily market report — finalized index close / change / turnover;
+    the authoritative ^TWII source when today's row is published (it lags on
+    the run day, so the chain falls through to MIS before Yahoo).
+  - TWSE MIS snapshot API — per-symbol last/final price (z) and prior close (y);
+    after the 13:30:30 closing auction it serves the session finals.
+  - Yahoo Finance v8 chart API — 5m series, 1-month daily closes, and whatever
+    the two official sources fail to provide. It was historically the sole
+    source; its 13:43 snapshot proved stale on 2026-11-11 (index 44,029.53 vs
+    official 44,257.15), hence the official-first overlay in apply_official().
 
 Stdlib only. Usage and verdict format: see fetch_us.py.
 
@@ -42,6 +48,11 @@ CTX = ssl.create_default_context()
 CTX.check_hostname = False
 CTX.verify_mode = ssl.CERT_NONE
 TWSE_H = dict(UA, Accept="application/json,*/*;q=0.8", Referer="https://www.twse.com.tw/zh/")
+MIS_H = dict(UA, Accept="application/json,text/plain,*/*;q=0.8",
+             Referer="https://mis.twse.com.tw/stock/index.jsp")
+_OPENER = urllib.request.build_opener(
+    urllib.request.HTTPCookieProcessor(),
+    urllib.request.HTTPSHandler(context=CTX))
 
 
 def get_json(url, headers=None, timeout=20, context=None):
@@ -125,6 +136,110 @@ def fetch_fmtqik(today_compact, verbose):
         return {"error": str(e)[:150]}
 
 
+def _mis_num(d, key):
+    s = str(d.get(key, "")).replace(",", "")
+    try:
+        return float(s)
+    except ValueError:
+        return None
+
+
+def _mis_get(raw_sym):
+    """One MIS symbol snapshot (raw_sym 't00' = weighted index, else stock code).
+    The first request often bootstraps an empty session — retry with cookies."""
+    url = "https://mis.twse.com.tw/stock/api/getStockInfo.jsp?ex_ch=tse_%s.tw" % raw_sym
+    for _ in range(3):
+        try:
+            req = urllib.request.Request(url, headers=MIS_H)
+            with _OPENER.open(req, timeout=15) as r:
+                arr = (json.load(r) or {}).get("msgArray") or []
+            if arr:
+                return arr[0]
+        except Exception:  # noqa: BLE001
+            pass
+        time.sleep(1.2)
+    return None
+
+
+def fetch_mis_quotes(verbose):
+    """MIS snapshot for the index + all stocks; after the closing auction the
+    z price is the session final. Returns {sym: {close, prev, high, low}}."""
+    out = {}
+    for raw in ["t00"] + [s.split(".")[0] for s in SYMBOLS if s != "^TWII"]:
+        d = _mis_get(raw)
+        if d:
+            rec = {"close": _mis_num(d, "z"), "prev": _mis_num(d, "y"),
+                   "high": _mis_num(d, "h"), "low": _mis_num(d, "l")}
+            if rec["close"] is None and rec["high"] is not None and rec["high"] == rec["low"]:
+                rec["close"] = rec["high"]  # one-price session (e.g. limit move)
+            if rec["close"] is not None and rec["prev"]:
+                out["^TWII" if raw == "t00" else raw + ".TW"] = rec
+        time.sleep(0.3)
+    if verbose:
+        print("MIS OK:", sorted(out.keys()))
+    return out
+
+
+def _override(rec, session_date, close, prev, high=None, low=None, src="official"):
+    """Write an official close/prev into a Yahoo record and re-derive chg/pct;
+    patch the series/daily tails so charts end at the finalized value. Volume
+    intentionally stays Yahoo-side (share units, unlike MIS 張)."""
+    rec["close"] = round(close, 2)
+    if prev:
+        rec["prev"] = round(prev, 2)
+    if rec.get("prev"):
+        rec["chg"] = round(rec["close"] - rec["prev"], 2)
+        rec["pct"] = round((rec["close"] / rec["prev"] - 1) * 100, 2)
+    if high is not None:
+        rec["day_high"] = high
+    if low is not None:
+        rec["day_low"] = low
+    rec["src"] = src
+    if rec.get("series"):
+        rec["series"][-1] = rec["close"]
+    daily = rec.get("daily") or []
+    if daily and daily[-1]["date"] == session_date:
+        daily[-1]["close"] = rec["close"]
+    elif daily and daily[-1]["date"] < session_date:
+        daily.append({"date": session_date, "close": rec["close"]})
+
+
+def apply_official(out, fmtqik, mis, session_date, verbose):
+    """Overlay TWSE official closes onto the Yahoo records — official first,
+    Yahoo last. Index: FMTQIK today row → MIS → Yahoo; stocks: MIS → Yahoo.
+    Returns {"index": src, "stocks": src_summary} for the verdict."""
+    src_idx = "yahoo"
+    twii = out.setdefault("^TWII", {})
+    today_row = fmtqik.get("today") if isinstance(fmtqik, dict) else None
+    if today_row and today_row.get("index_close") is not None:
+        chg = today_row.get("change")
+        prev = (today_row["index_close"] - chg) if chg is not None else twii.get("prev")
+        _override(twii, session_date, close=today_row["index_close"], prev=prev, src="twse_fmtqik")
+        src_idx = "twse_fmtqik"
+    elif "^TWII" in mis:
+        m = mis["^TWII"]
+        _override(twii, session_date, close=m["close"], prev=m["prev"],
+                  high=m["high"], low=m["low"], src="twse_mis")
+        src_idx = "twse_mis"
+    srcs = []
+    for sym, v in out.items():
+        if sym == "^TWII" or "error" in v:
+            continue
+        if sym in mis:
+            m = mis[sym]
+            _override(v, session_date, close=m["close"], prev=m["prev"],
+                      high=m["high"], low=m["low"], src="twse_mis")
+            srcs.append("twse_mis")
+        else:
+            srcs.append("yahoo")
+    src_stock = "yahoo"
+    if srcs:
+        src_stock = "twse_mis" if all(s == "twse_mis" for s in srcs) else "mixed"
+    if verbose:
+        print("sources: index=%s stocks=%s" % (src_idx, src_stock))
+    return {"index": src_idx, "stocks": src_stock}
+
+
 def main():
     verbose = "--verbose" in sys.argv
     now_tpe = time.gmtime(time.time() + 8 * 3600)
@@ -157,19 +272,22 @@ def main():
         print(json.dumps(verdict, ensure_ascii=False))
         sys.exit(0)
 
+    mis = fetch_mis_quotes(verbose)
     fmtqik = fetch_fmtqik(today_compact, verbose)
+    sources = apply_official(out, fmtqik, mis, session_date, verbose)
 
     rel = "data/tw_%s.json" % today_compact
     dst = os.path.join(ROOT, rel)
     with open(dst, "w", encoding="utf-8") as f:
         json.dump({"market": "tw", "session_date": session_date,
                    "fetched_at": time.strftime("%Y-%m-%dT%H:%M:%S+08:00", now_tpe),
-                   "quotes": out, "fmtqik": fmtqik}, f, ensure_ascii=False, indent=1)
+                   "quotes": out, "fmtqik": fmtqik, "sources": sources}, f, ensure_ascii=False, indent=1)
 
     report_dir = os.path.join(ROOT, "reports", "tw", session_date)
     verdict.update(ok=True, session_date=session_date, output=rel,
                    report_exists=os.path.isfile(os.path.join(report_dir, "index.html")),
-                   symbol_errors=errors, fmtqik_today=bool(fmtqik.get("today")), reason=None)
+                   symbol_errors=errors, fmtqik_today=bool(fmtqik.get("today")),
+                   sources=sources, reason=None)
     print(json.dumps(verdict, ensure_ascii=False))
 
 

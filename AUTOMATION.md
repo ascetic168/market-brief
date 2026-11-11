@@ -19,7 +19,11 @@ GitHub 官方提醒尖峰時刻（整點）排程可能延遲數分鐘至更久�
 ## 每日流程（兩支 workflow 相同）
 
 1. **台北時間守衛**：台股需 ≥13:35、美股需 ≥05:10（台北），否則跳過
-2. **抓報價** `scripts/fetch_us.py`／`fetch_tw.py`（Yahoo Finance，stdlib）
+2. **抓報價** `scripts/fetch_us.py`（Yahoo Finance，stdlib）／`fetch_tw.py`
+   （官方優先：指數定案＝證交所 FMTQIK 日統計 → MIS 快照 → Yahoo；個股收盤＝
+   MIS → Yahoo；走勢／日線＝Yahoo。13:43 的 Yahoo `^TWII` 快照曾出現過時值
+   （2026-11-11：44,029.53 vs 官方 44,257.15），故台股一律以官方來源 overlay
+   並重推漲跌幅、修行走勢端點；任一官方來源失敗自動落到下一層）
    → 單行 JSON verdict：`ok=false`（來源異常）或 `report_exists=true`（假日／重跑，靜默結束）才繼續
 3. **抓新聞** `scripts/fetch_news.py` — 免金鑰三層來源：
    Google News RSS（骨幹）→ Bing News RSS（異源備援）→ 媒體 RSS（LTN／CNBC／MarketWatch）

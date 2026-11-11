@@ -65,7 +65,9 @@ def build_blocks(market, quotes):
             v = dict(v, volume=None)  # index quotes carry no volume; show —
         rows.append((v.get("name") or sym, sym.split(".")[0] if not sym.startswith("^") else sym.replace("^", ""),
                      group_of(market, sym), v, ""))
-    table = quote_table_html(rows, "表 1：%s主要指數與標的收盤行情（紅漲／綠跌；資料：Yahoo Finance 定案數據）" % MARKET_NAME[market],
+    src_note = ("資料：證交所 FMTQIK／MIS 定案數據，走勢圖 Yahoo Finance" if market == "tw"
+                else "資料：Yahoo Finance 定案數據")
+    table = quote_table_html(rows, "表 1：%s主要指數與標的收盤行情（紅漲／綠跌；%s）" % (MARKET_NAME[market], src_note),
                              extra_col="成交量")
     sparks = "\n".join(
         sparkline_html(quotes[sym], label, disp, sess)
@@ -118,7 +120,7 @@ SYSTEM_TMPL = """你是「經濟循環研究 · 收盤快報」的資深撰述�
 - 只輸出一個 JSON 物件，不要 markdown 圍欄。Schema:
   {"title": "...", "meta_line": "...", "summary_html": "...", "sections": [{"heading": "...", "body_html": "..."}], "footer_note": "..."}
 - title：%(market)s收盤報告的主題式標題（不含日期）。要抓當日故事，不要「大漲大跌」這種空泛詞。
-- meta_line：一行，含 收盤定案日期（%(session)s）與 資料來源：Yahoo Finance 定案數據＋當日新聞彙整。
+- meta_line：一行，含 收盤定案日期（%(session)s）與 資料來源：官方定案數據（美股＝Yahoo Finance；台股＝證交所 FMTQIK／MIS，走勢圖 Yahoo Finance）＋當日新聞彙整。
 - summary_html：以 <b>一句話結論：</b> 開頭，100–250 字，量價＋事件＋結構三要素；可用 <b class="up">／<b class="down">。
 - sections 至少五節，依序：
   1.「一、收盤快照」body_html 必須剛好包含兩行佔位符：__CARDS__ 與 __TABLE__（各自獨立一行，__CARDS__ 會被替換成完整的三格卡片區塊、__TABLE__ 會被替換成完整表格＋表註——不要用自己的 div 包住佔位符；佔位符前可加一句導言）。
