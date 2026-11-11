@@ -4,6 +4,25 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.2] - 2026-11-12
+
+### Added
+
+- Site archive (歷史封存): client-side search box with normalized matching
+  over title + summary + date + market label — `11/11`, `1111` and
+  `2026-11-11` all match the same date, so users can search the way they
+  actually remember. Live result count, helpful empty-state hints, and the
+  query stacks on the existing market filter chips. Both `input` and
+  `search` events are handled so Escape / the native clear button reset
+  the query on all browsers.
+
+### Changed
+
+- Archive rows now show a 2-line summary preview, and both title and
+  summary are clamped to 2 lines with ellipsis. The limit is display-only —
+  manifest.json keeps the full editorial text and the report page keeps the
+  full content — so row heights stay consistent as the archive grows.
+
 ## [0.2.1] - 2026-11-10
 
 ### Fixed
