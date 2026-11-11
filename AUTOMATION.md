@@ -3,15 +3,18 @@
 > 本 repo 的報告由 **GitHub Actions 雲端管線**全自動產出，不依賴任何本地機器。
 > 本文件描述架構、排程、秘鑰與維運要點。
 
-## 排程（GitHub Actions cron，UTC）
+## 排程與觸發
 
-| Workflow | Cron (UTC) | 台北時間 | 涵蓋 |
+| Workflow | GitHub 排程（備用，UTC） | 台北時間 | 涵蓋 |
 |---|---|---|---|
 | [tw-report.yml](.github/workflows/tw-report.yml) | `43 5 * * 1-5` | 週一至週五 13:43 | 台股 13:30 收盤＋13:33 定盤後 |
 | [us-report.yml](.github/workflows/us-report.yml) | `33 21 * * 2-6` | 週二至週六 05:33 | 美股收盤（冬令台北 05:00／夏令 04:00 之後） |
 
-GitHub 官方提醒尖峰時刻（整點）排程可能延遲數分鐘至更久，故刻意避開整點。
-兩支 workflow 皆支援 `workflow_dispatch` 手動觸發，附：
+- **主要觸發**：外部 cron-job.org → `workflow_dispatch` API（2026-11-12 起運作；
+  GitHub schedule 降為每日一次備用，0.2.1 的 +30 分 catch-up 已移除——
+  冪等閘門〔時間守衛＋report_exists〕使重複觸發無害，一次備用即足）。
+- GitHub 官方提醒尖峰時刻（整點）排程可能延遲數分鐘至更久，故備用排程刻意避開整點。
+- 兩支 workflow 皆支援 `workflow_dispatch` 手動觸發，附：
 
 - **dry_run**：只抓資料＋新聞、不呼叫 LLM、不 push（驗證 runner 連線用）
 - **force**：繞過台北時間守衛（除錯用；正式排程不需要）

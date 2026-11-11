@@ -2,8 +2,7 @@ name: US closing report
 
 on:
   schedule:
-    - cron: "33 21 * * 2-6"   # 05:33 Taipei primary (US closes 16:00 ET = 04:00/05:00 Taipei)
-    - cron: "3 22 * * 2-6"    # 06:03 Taipei catch-up (GitHub scheduler delay/drop resilience)
+    - cron: "33 21 * * 2-6"   # 05:33 Taipei backup (primary trigger = cron-job.org -> workflow_dispatch; US closes 16:00 ET = 04:00/05:00 Taipei)
   workflow_dispatch:
     inputs:
       dry_run:

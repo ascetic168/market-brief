@@ -4,6 +4,16 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.4] - 2026-11-12
+
+### Changed
+
+- Primary report triggering moved to an external cron-job.org job calling the
+  `workflow_dispatch` API (observed working: the 2026-11-12 05:32 Taipei US
+  run). GitHub schedules are demoted to one daily backup per workflow, and the
+  +30-minute catch-up crons added in 0.2.1 are removed. The idempotent
+  trading-day / report-exists gates keep duplicate triggers harmless.
+
 ## [0.2.3] - 2026-11-12
 
 ### Fixed
