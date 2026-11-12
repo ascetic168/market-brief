@@ -9,6 +9,7 @@
 |---|---|---|---|
 | [tw-report.yml](.github/workflows/tw-report.yml) | `43 5 * * 1-5` | 週一至週五 13:43 | 台股 13:30 收盤＋13:33 定盤後 |
 | [us-report.yml](.github/workflows/us-report.yml) | `33 21 * * 2-6` | 週二至週六 05:33 | 美股收盤（冬令台北 05:00／夏令 04:00 之後） |
+| [tw-chips.yml](.github/workflows/tw-chips.yml) | `50 13 * * 1-5` | 週一至週五 21:50 | 台股籌碼（三大法人＋資券）靜默寫入系列記憶 |
 
 - **主要觸發**：外部 cron-job.org → `workflow_dispatch` API（2026-11-12 起運作；
   GitHub schedule 降為每日一次備用，0.2.1 的 +30 分 catch-up 已移除——
@@ -54,6 +55,18 @@
 清除後歷史仍在 git。維運與未來 T86 晚間 run 用 CLI：
 `python scripts/state_store.py show|add|resolve|prune`（`--file` 指定他檔供測試）；
 `gen_report_cloud.py --dump-prompt PATH` 可不呼 LLM 檢視完整 prompt。
+
+## 籌碼補完（tw-chips）
+
+21:50（台北）的靜默 run：`fetch_chips.py` 抓證交所三大法人買賣金額（BFI82U）與融資融券
+餘額（MI_MARGN）定案值，以 `routine` 記錄（topic `tw-t86`／`tw-margin`，附 `session_date`
+防重）寫入 `data/state.jsonl` 後直接 commit——**不產報告頁、不呼 LLM**。隔日 13:43 的台股
+報告經【系列記憶】讀到前一日籌碼，解讀與待查結案由該次生成完成（當日數據依然禁填，誠實
+條款不變）。失敗照樣開 `automation-failure` Issue。端點有大小寫／新舊路徑陷阱（BFI82U
+大寫走 rwd/、MI_MARGN 走舊式 exchangeReport/，其餘變體皆 404），改動前先讀
+fetch_chips.py 頂部註記。同日重跑自動跳過（`duplicate: true`）；補抓舊日用
+`--date YYYYMMDD`。若要外部主觸發，cron-job.org 加一條 21:50 的 `workflow_dispatch`
+即可（GitHub schedule 已是備用）。
 
 ## 秘鑰與設定
 

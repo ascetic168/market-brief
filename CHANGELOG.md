@@ -4,6 +4,23 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.6] - 2026-11-13
+
+### Added
+
+- TW chip supplement (`tw-chips.yml` + `scripts/fetch_chips.py`): a silent
+  21:50 Taipei run that fetches TWSE institutional buy/sell totals (BFI82U)
+  and margin balances (MI_MARGN) and appends them into the series memory as
+  routine facts (`tw-t86` / `tw-margin`, deduped per session date) — no LLM,
+  no report page. The next 13:43 TW report reads them via the 系列記憶 digest
+  and finally gets a chips section (prior trading day only; the same-day T86
+  honesty clause is unchanged). Endpoint quirks documented in-code: BFI82U is
+  uppercase under rwd/zh/fund/, MI_MARGN lives under the old exchangeReport/
+  path — every other variant 404s to page-not-found. Verified against the
+  2026-11-12 finals (合計買超 53.4 億; 融資餘額 5,334.7 億 / -76.8 億; 融券
+  210,522 張), duplicate re-runs skip cleanly, and the unpublished-day path
+  fails gracefully with an alert issue.
+
 ## [0.2.5] - 2026-11-13
 
 ### Added

@@ -1,0 +1,78 @@
+name: TW chip supplement
+
+on:
+  schedule:
+    - cron: "50 13 * * 1-5"   # 21:50 Taipei backup (primary trigger = cron-job.org → workflow_dispatch; T86 ~17:00 + margin balance ~21:30 both published by then)
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Bypass the Taipei-time guard (debug only)"
+        type: boolean
+        default: false
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: tw-chips
+  cancel-in-progress: false
+
+jobs:
+  chips:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Taipei-time guard
+        id: guard
+        run: |
+          python - <<'EOF'
+          import datetime, os
+          force = "${{ inputs.force }}" == "true"
+          now = datetime.datetime.utcnow() + datetime.timedelta(hours=8)
+          skip, reason = "false", ""
+          if not force:
+              if now.weekday() >= 5:
+                  skip, reason = "true", "weekend (Taipei)"
+              elif now.time() < datetime.time(21, 45):
+                  skip, reason = "true", "before 21:45 Taipei (margin balance ~21:30)"
+          with open(os.environ["GITHUB_OUTPUT"], "a") as f:
+              f.write("skip=%s\n" % skip)
+              f.write("reason=%s\n" % reason)
+          print("guard: skip=%s reason=%s now=%s" % (skip, reason, now))
+          EOF
+
+      - name: Fetch chips into series memory
+        if: steps.guard.outputs.skip != 'true'
+        id: chips
+        run: python scripts/fetch_chips.py | tee /tmp/chips_verdict.txt
+
+      - name: Commit and push
+        if: steps.guard.outputs.skip != 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/state.jsonl
+          git diff --cached --stat
+          git commit -m "docs(tw): series-memory chip data" || echo "nothing to commit"
+          git push
+
+      - name: Open issue on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const title = `automation failure: TW chip supplement`;
+            const body = `Run failed: ${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}\n\nCheck the logs; the fetch_chips verdict JSON names the failing source (BFI82U / MI_MARGN).`;
+            const existing = await github.rest.issues.listForRepo({...context.repo, state: "open", labels: "automation-failure"});
+            if (existing.data.some(i => i.title === title)) {
+              await github.rest.issues.createComment({...context.repo, issue_number: existing.data.find(i => i.title === title).number, body});
+            } else {
+              await github.rest.issues.create({...context.repo, title, body, labels: ["automation-failure"]});
+            }
