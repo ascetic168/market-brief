@@ -31,9 +31,13 @@
 3. **抓新聞** `scripts/fetch_news.py` — 免金鑰三層來源：
    Google News RSS（骨幹）→ Bing News RSS（異源備援）→ 媒體 RSS（LTN／CNBC／MarketWatch）
    去重、限 40 小時內、關鍵詞相關度排序，另依當日最大 movers 動態加一組查詢
-4. **生成** `scripts/gen_report_cloud.py` — LLM（GLM，OpenAI-compatible 端點）只寫敘事 JSON，
-   Python 用 `templates/report_base.html` ＋ `report_helpers.py` 確定性組裝 HTML
-   （卡片／表格／走勢圖完全由數據決定，LLM 不碰數字）
+4. **生成** `scripts/gen_report_cloud.py` — LLM（GLM，OpenAI-compatible 端點）只寫敘事 JSON
+   （含 `open_items` 新追蹤項與 `resolutions` 對既有待查項的結論），Python 用
+   `templates/report_base.html` ＋ `report_helpers.py` 確定性組裝 HTML
+   （卡片／表格／走勢圖完全由數據決定，LLM 不碰數字）。生成前對系列記憶
+   `data/state.jsonl` 做過期掃描並注入【系列記憶】摘要；生成後 Python 追加當日
+   常規事實與收盤快報結論（`<market>-brief`），LLM 的 open／resolved 亦入帳
+   （state 失敗只記 warning，不影響已寫出的報告）
 5. **更新索引** `scripts/update_manifest.py` → commit（`docs(tw|us): add ... report <date>`）→ push → Pages 自動重建
 6. **失敗告警**：任何步驟失敗自動開／留言 `automation-failure` 標籤的 Issue（GitHub 寄信通知）
 
@@ -41,6 +45,15 @@
 
 `CONTEXT.md` 是所有生成者的知識基底：市場位階、名家框架、台股階段防線、
 寫作紀律（誠實條款：13:43 的台股報告禁止填入當日三大法人數據等）。重大事件後應人工更新此檔。
+
+`data/state.jsonl` 則是自動維護的「系列記憶」（0.2.5 起；append-only JSONL，同 id 以最新
+記錄為準），讓每次生成讀得到前幾日的脈絡——不只前一天。狀態與壽命：`routine`（Python
+寫入的常規事實＋收盤快報結論，7 天）、`open`（待查，上限 21 天，逾期標 `expired` 並在
+觀察清單註記追蹤逾時結案）、`resolved`（結論寫回而非刪除，7 天）、`expired`（3 天 grace
+後清除）。prompt 注入按 `expires` 過濾並封頂 30 筆，正確性不依賴 prune 是否執行；實體
+清除後歷史仍在 git。維運與未來 T86 晚間 run 用 CLI：
+`python scripts/state_store.py show|add|resolve|prune`（`--file` 指定他檔供測試）；
+`gen_report_cloud.py --dump-prompt PATH` 可不呼 LLM 檢視完整 prompt。
 
 ## 秘鑰與設定
 

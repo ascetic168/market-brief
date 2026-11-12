@@ -4,6 +4,30 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.5] - 2026-11-13
+
+### Added
+
+- Series memory: an append-only JSONL state file (`data/state.jsonl`, managed by
+  the new `scripts/state_store.py`) that gives every generation run bounded
+  multi-day context instead of only today's data+news. The latest record per id
+  wins; statuses are `routine` (deterministic facts + each report's one-line
+  conclusion as `<market>-brief`, 7-day TTL), `open` (pending investigation
+  items, 21-day cap, on expiry marked `expired` and noted in the report's
+  watchlist, 3-day grace), `resolved` (conclusion written back rather than
+  deleted, 7-day TTL), `expired`. `gen_report_cloud.py` prunes dead threads,
+  injects the filtered digest (≤30 entries) as a 【系列記憶】prompt block,
+  extends the LLM schema with `open_items` / `resolutions` (resolution ids are
+  validated against live open items; bad ids are skipped with a warning), and
+  appends routine facts + report brief back after the report is written —
+  a state failure never fails the already-written report. The `<market>-brief`
+  records also fulfil CONTEXT.md §六's cross-market reference in the cloud
+  pipeline (TW 13:43 can cite the previous US night's conclusion) without
+  reading report files. Ops/future T86-evening-run CLI: `show|add|resolve|prune`;
+  `gen_report_cloud.py --dump-prompt PATH` inspects the full prompt without an
+  LLM call. Prune rewrites are hygiene only — prompt injection filters by
+  `expires`, and git history is the permanent archive.
+
 ## [0.2.4] - 2026-11-12
 
 ### Changed

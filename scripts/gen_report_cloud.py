@@ -1,13 +1,20 @@
 # -*- coding: utf-8 -*-
 """Cloud report generator: GitHub Models writes the narrative, Python assembles.
 
-Pipeline: data json + news json + CONTEXT.md + report_helpers blocks
-          → one LLM call returning strict JSON (title / meta / summary / sections)
-          → deterministic HTML assembly from templates/report_base.html.
+Pipeline: data json + news json + CONTEXT.md + series memory (data/state.jsonl,
+          via state_store.py) + report_helpers blocks
+          → one LLM call returning strict JSON (title / meta / summary /
+          sections / open_items / resolutions)
+          → deterministic HTML assembly from templates/report_base.html,
+          then routine facts + report brief + LLM open/resolved records are
+          appended back to the state file.
 
 Usage:
     python scripts/gen_report_cloud.py <market us|tw> <data.json> <news.json> \
-        [--out-dir DIR] [--model MODEL] [--max-news 18]
+        [--out-dir DIR] [--model MODEL] [--max-news 18] [--dump-prompt PATH]
+
+--dump-prompt PATH assembles system+user prompts (with the state digest; prune
+runs read-only) and exits before the LLM call — debugging aid for smoke runs.
 
 Env: LLM_API_TOKEN (API key for the OpenAI-compatible endpoint), optional
 LLM_BASE_URL / LLM_MODEL (defaults: Zhipu bigmodel.cn coding endpoint, glm-5.3-flash). Default output
@@ -23,11 +30,15 @@ import urllib.request
 
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from report_helpers import cards_html, fmt, quote_table_html, sparkline_html  # noqa: E402
+from state_store import (append_records, make_record, make_report_brief,  # noqa: E402
+                         make_routine_facts, prune_state, state_digest)
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # OpenAI-compatible endpoint; default is Zhipu bigmodel.cn coding plan (GLM). Override via env.
 ENDPOINT = os.environ.get("LLM_BASE_URL", "https://open.bigmodel.cn/api/coding/paas/v4/chat/completions")
 DEFAULT_MODEL = os.environ.get("LLM_MODEL", "glm-5.3-flash")
+# Series memory file; MARKET_BRIEF_STATE overrides for tests.
+STATE_PATH = os.environ.get("MARKET_BRIEF_STATE") or os.path.join(ROOT, "data", "state.jsonl")
 
 CARDS_SPECS = {
     "us": [("^GSPC", "S&P 500", "GSPC"), ("^IXIC", "Nasdaq Composite", "IXIC"), ("^SOX", "費城半導體", "SOX")],
@@ -118,7 +129,7 @@ SYSTEM_TMPL = """你是「經濟循環研究 · 收盤快報」的資深撰述�
 
 【本次輸出規則】
 - 只輸出一個 JSON 物件，不要 markdown 圍欄。Schema:
-  {"title": "...", "meta_line": "...", "summary_html": "...", "sections": [{"heading": "...", "body_html": "..."}], "footer_note": "..."}
+  {"title": "...", "meta_line": "...", "summary_html": "...", "sections": [{"heading": "...", "body_html": "..."}], "footer_note": "...", "open_items": [{"topic": "...", "text": "..."}], "resolutions": [{"id": "...", "text": "..."}]}
 - title：%(market)s收盤報告的主題式標題（不含日期）。要抓當日故事，不要「大漲大跌」這種空泛詞。
 - meta_line：一行，含 收盤定案日期（%(session)s）與 資料來源：官方定案數據（美股＝Yahoo Finance；台股＝證交所 FMTQIK／MIS，走勢圖 Yahoo Finance）＋當日新聞彙整。
 - summary_html：以 <b>一句話結論：</b> 開頭，100–250 字，量價＋事件＋結構三要素；可用 <b class="up">／<b class="down">。
@@ -129,6 +140,10 @@ SYSTEM_TMPL = """你是「經濟循環研究 · 收盤快報」的資深撰述�
   4. 依當日情況 0–2 個進階節（名家框架印證／政策與事件／對另一市場的連動／階段防線——防線表用 <table class="stage">，區間照 CONTEXT，但「現況」欄依當日數據重算）。
   5. 「觀察清單」：<ol>，4–7 個下一交易日具體檢驗點（指數關卡、事件日、待發布數據）。%(watch_extra)s
   6. 「資料來源」：<ul class="src">，逐條列出（Yahoo Finance 定案數據；新聞引用列媒體名＋日期，不編造連結；CONTEXT 引用註明「系列脈絡」）。
+- 【系列記憶】使用規則（user 訊息末附狀態檔摘要；標籤：[待查]＝未結案追蹤項、[結論]＝已結案結論、[逾時結案]＝追蹤逾時、[常規]＝近期市場事實）：
+  - 今日數據或事件已能回答某 [待查] 項時，將其 id 原樣填入 resolutions 的 "id"，"text" 寫 1–2 句結論；答不了就不要列。
+  - [逾時結案] 項必須在「觀察清單」末尾加一條 <li>追蹤逾時結案：…（id）</li>。
+  - open_items：0–4 個本日新產生、值得後續交易日追蹤的具體問題（事件日、待發布數據、待驗證論點）；topic 用短代號（如 nvda、fed、tw-t86）；不要把常規事實列入。
 - 誠實條款：推測標明「推論，非實證」；不虛構任何數字、人名引述或媒體；新聞沒提的因果不要硬套。
 - footer_note：一句話（例：本報告為 N 收盤定案數據；不構成投資建議），python 會再附上免責與生成時間。"""
 
@@ -211,11 +226,14 @@ def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     market, data_path, news_path = args[0], args[1], args[2]
     out_dir = None
+    dump_prompt = None
     model = DEFAULT_MODEL
     max_news = 18
     for i, a in enumerate(sys.argv):
         if a == "--out-dir" and i + 1 < len(sys.argv):
             out_dir = sys.argv[i + 1]
+        if a == "--dump-prompt" and i + 1 < len(sys.argv):
+            dump_prompt = sys.argv[i + 1]
         if a == "--model" and i + 1 < len(sys.argv):
             model = sys.argv[i + 1]
         if a == "--max-news" and i + 1 < len(sys.argv):
@@ -235,12 +253,27 @@ def main():
         template = f.read()
 
     session_date = data["session_date"]
+    # Series memory: expire dead threads first (write=False keeps --dump-prompt
+    # read-only), then inject the bounded digest into the prompt.
+    state_path = STATE_PATH
+    latest, newly_expired = prune_state(state_path, write=not dump_prompt)
+    digest_text = state_digest(latest)
     cards, table, sparks = build_blocks(market, data["quotes"])
 
     system = SYSTEM_TMPL % {"market": MARKET_NAME[market], "session": SESSION_LABEL[market],
                             "context": context, "watch_extra": WATCH_EXTRA[market]}
-    user = "【市場數據】%s 交易日 %s\n%s\n\n【當日新聞彙整（Google/Bing News，已依相關度排序）】\n%s\n\n請產出 JSON。" % (
-        MARKET_NAME[market], session_date, data_digest(market, data), news_digest(news, max_news))
+    user = ("【市場數據】%s 交易日 %s\n%s\n\n【當日新聞彙整（Google/Bing News，已依相關度排序）】\n%s\n\n"
+            "【系列記憶（狀態檔摘要；[待查] 項的 id 供結案引用）】\n%s\n\n請產出 JSON。" % (
+                MARKET_NAME[market], session_date, data_digest(market, data),
+                news_digest(news, max_news), digest_text))
+
+    if dump_prompt:
+        os.makedirs(os.path.dirname(os.path.abspath(dump_prompt)) or ".", exist_ok=True)
+        with open(dump_prompt, "w", encoding="utf-8", newline="\n") as f:
+            f.write("=== SYSTEM ===\n%s\n\n=== USER ===\n%s\n" % (system, user))
+        print(json.dumps({"ok": True, "dump_prompt": dump_prompt,
+                          "state_expired_marked": len(newly_expired)}, ensure_ascii=False))
+        return
 
     result, usage, last_err = None, None, None
     for attempt in (1, 2):
@@ -293,8 +326,50 @@ def main():
     os.makedirs(os.path.dirname(dst), exist_ok=True)
     with open(dst, "w", encoding="utf-8") as f:
         f.write(html)
-    print(json.dumps({"ok": True, "market": market, "session_date": session_date, "title": result["title"],
-                      "output": dst, "model": model, "tokens": usage}, ensure_ascii=False))
+
+    # State write-back: routine facts + report brief are deterministic; the
+    # LLM contributes open_items (new questions) and resolutions (conclusions
+    # for existing [待查] ids). Best-effort — a state failure never kills the
+    # report that was already written.
+    warnings, n_added = [], 0
+    try:
+        base_ids = tuple(latest.keys())
+        new_recs = make_routine_facts(market, data, existing_ids=base_ids)
+        new_recs += make_report_brief(market, result, session_date,
+                                      existing_ids=base_ids + tuple(r["id"] for r in new_recs))
+
+        def _ids():
+            return base_ids + tuple(r["id"] for r in new_recs)
+
+        for item in (result.get("open_items") or [])[:6]:
+            text = (item.get("text") or "").strip()
+            if not text:
+                continue
+            topic = ((item.get("topic") or "general").strip()[:40]) or "general"
+            new_recs.append(make_record("open", topic, text[:200], existing_ids=_ids()))
+        for res in (result.get("resolutions") or [])[:6]:
+            rid = (res.get("id") or "").strip()
+            text = (res.get("text") or "").strip()
+            if not rid or not text:
+                continue
+            tgt = latest.get(rid)
+            if not tgt or tgt.get("status") != "open":
+                warnings.append("resolution skipped (unknown/closed id %s)" % rid)
+                continue
+            rec = make_record("resolved", tgt.get("topic", "general"),
+                              text if text.startswith("結論") else "結論：" + text, existing_ids=_ids())
+            rec["id"] = rid
+            new_recs.append(rec)
+        n_added = append_records(state_path, new_recs)
+    except Exception as e:  # noqa: BLE001
+        warnings.append("state update failed: %s: %s" % (type(e).__name__, str(e)[:150]))
+
+    verdict = {"ok": True, "market": market, "session_date": session_date, "title": result["title"],
+               "output": dst, "model": model, "tokens": usage,
+               "state": {"added": n_added, "expired_marked": len(newly_expired)}}
+    if warnings:
+        verdict["warnings"] = warnings
+    print(json.dumps(verdict, ensure_ascii=False))
 
 
 if __name__ == "__main__":
