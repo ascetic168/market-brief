@@ -5,16 +5,21 @@
 
 ## 排程與觸發
 
-| Workflow | GitHub 排程（備用，UTC） | 台北時間 | 涵蓋 |
-|---|---|---|---|
-| [tw-report.yml](.github/workflows/tw-report.yml) | `43 5 * * 1-5` | 週一至週五 13:43 | 台股 13:30 收盤＋13:33 定盤後 |
-| [us-report.yml](.github/workflows/us-report.yml) | `33 21 * * 2-6` | 週二至週六 05:33 | 美股收盤（冬令台北 05:00／夏令 04:00 之後） |
-| [tw-chips.yml](.github/workflows/tw-chips.yml) | `50 13 * * 1-5` | 週一至週五 21:50 | 台股籌碼（三大法人＋資券）靜默寫入系列記憶 |
+| Workflow | cron-job.org 觸發（台北時間） | 涵蓋 |
+|---|---|---|
+| [tw-report.yml](.github/workflows/tw-report.yml) | 週一至週五 13:43 | 台股 13:30 收盤＋13:33 定盤後 |
+| [us-report.yml](.github/workflows/us-report.yml) | 週二至週六 05:33 | 美股收盤（冬令台北 05:00／夏令 04:00 之後） |
+| [tw-chips.yml](.github/workflows/tw-chips.yml) | 週一至週五 21:50 | 台股籌碼（三大法人＋資券）靜默寫入系列記憶 |
 
-- **主要觸發**：外部 cron-job.org → `workflow_dispatch` API（2026-11-12 起運作；
-  GitHub schedule 降為每日一次備用，0.2.1 的 +30 分 catch-up 已移除——
-  冪等閘門〔時間守衛＋report_exists〕使重複觸發無害，一次備用即足）。
-- GitHub 官方提醒尖峰時刻（整點）排程可能延遲數分鐘至更久，故備用排程刻意避開整點。
+- **唯一觸發**：外部 cron-job.org → `workflow_dispatch` API。GitHub Actions
+  `schedule` 備用已於 0.2.7 全數移除——2026-11-11..17 實測延遲 3.6~14.8 小時、
+  11/14 的美股備用甚至整次 drop（落到週日清晨才跑，被時間守衛擋下，當日美股
+  報告漏產），延遲的 chips run 也全數落到隔日清晨被守衛攔掉；cron-job.org 則
+  每日準點到秒。冪等閘門〔時間守衛＋report_exists〕保留，重複／手動觸發無害。
+  （11/14 那次漏產其實是外部觸發也缺席＋備用延遲的雙重失守——改為單一觸發
+  來源是接受取捨後的決定，靠 cron-job.org 自己的失敗通知兜底。）
+- **cron-job.org 成為單點**：job 停用／帳號異常時無任何備用，其 dashboard 的
+  失敗通知必須保持開啟。
 - 兩支 workflow 皆支援 `workflow_dispatch` 手動觸發，附：
 
 - **dry_run**：只抓資料＋新聞、不呼叫 LLM、不 push（驗證 runner 連線用）
@@ -39,8 +44,12 @@
    `data/state.jsonl` 做過期掃描並注入【系列記憶】摘要；生成後 Python 追加當日
    常規事實與收盤快報結論（`<market>-brief`），LLM 的 open／resolved 亦入帳
    （state 失敗只記 warning，不影響已寫出的報告）
-5. **更新索引** `scripts/update_manifest.py` → commit（`docs(tw|us): add ... report <date>`）→ push → Pages 自動重建
-6. **失敗告警**：任何步驟失敗自動開／留言 `automation-failure` 標籤的 Issue（GitHub 寄信通知）
+5. **更新索引** `scripts/update_manifest.py` → commit（`docs(tw|us): add ... report <date>`）→ push
+6. **部署守衛（0.2.8）** `scripts/watch_pages_build.py`：輪詢 Pages build（最長 6 分鐘），
+   未完成或出現 `errored` 時自動 POST 重建請求再等 5 分鐘；仍未完成則步驟失敗、交由
+   下一項告警。11-17 事故（build 卡 `building` 近 3 小時、網站停在前日版本而 run 顯示
+   success）的對症修復——卡住的 Pages build 不會被 run 內的失敗告警看到。
+7. **失敗告警**：任何步驟失敗自動開／留言 `automation-failure` 標籤的 Issue（GitHub 寄信通知）
 
 ## 系列脈絡
 
@@ -65,8 +74,9 @@
 條款不變）。失敗照樣開 `automation-failure` Issue。端點有大小寫／新舊路徑陷阱（BFI82U
 大寫走 rwd/、MI_MARGN 走舊式 exchangeReport/，其餘變體皆 404），改動前先讀
 fetch_chips.py 頂部註記。同日重跑自動跳過（`duplicate: true`）；補抓舊日用
-`--date YYYYMMDD`。若要外部主觸發，cron-job.org 加一條 21:50 的 `workflow_dispatch`
-即可（GitHub schedule 已是備用）。
+`--date YYYYMMDD`。外部 21:50 觸發於 2026-11-17 才補上（先前誤設 13:43 與台股報告同時段，
+一律被時間守衛攔下；21:50 的 GitHub 備用又全數延遲到隔日清晨被擋——0.2.6 上線後籌碼記憶
+實際上從未成功寫入過，`data/state.jsonl` 裡的 `tw-t86` 皆為 open 佔位項）。
 
 ## 秘鑰與設定
 
@@ -88,6 +98,9 @@ fetch_chips.py 頂部註記。同日重跑自動跳過（`duplicate: true`）；
 
 ## 已知限制
 
-- Actions `schedule` 於尖峰可能延遲（官方文件明載）；報告時間以 commit 為準
+- cron-job.org 為唯一觸發（0.2.7）：它缺席時無備用，僅能靠其 dashboard 失敗通知；
+  報告時間以 commit 為準
+- GitHub Pages build 偶發卡死在 `building`（2026-11-17 實例）：push 後的 watch 步驟
+  會輪詢並自動請求重建，重建窗口內仍未完成才開 Issue 告警
 - Yahoo 對資料中心 IP 偶發限流：fetch 腳本已內建重試；連續失敗會開 Issue 告警
 - Google News RSS 偶發對 runner IP 拒答：有 Bing＋媒體 RSS 兩層備援，全失敗時報告以純數據模式產出

@@ -4,6 +4,34 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.7] - 2026-11-17
+
+### Added
+
+- Pages build watch: after each report push, `scripts/watch_pages_build.py`
+  polls the Pages builds API (up to 6 min) and POSTs a rebuild request if the
+  build hangs or flips to `errored` — the exact failure seen on 2026-11-17,
+  when a build stuck in "building" for ~2h45m kept the site on the previous
+  day's report while the workflow run showed success. If the rebuild window
+  also passes without a `built` status the step fails and the existing
+  `automation-failure` alert fires (hung Pages builds were previously
+  invisible to run-level alerting). Report workflows declare `pages: write`
+  for the watch.
+
+### Removed
+
+- GitHub Actions `schedule` backups from all three workflows; cron-job.org's
+  `workflow_dispatch` is now the sole trigger. Over 2026-11-11..17 GitHub's
+  schedule runs arrived 3.6–14.8 h late: the 11/14 US backup landed on Sunday
+  morning Taipei and was skipped by the time guard, leaving the US 11/14
+  close without a report (the Sat-morning primary dispatch also never
+  fired), and every delayed tw-chips run landed before its 21:45 guard and
+  silently did nothing — the chip supplement has recorded nothing since
+  0.2.6. cron-job.org fired at exact times daily, so the backup only added
+  silent no-ops. The idempotency gates (Taipei time guard + report_exists)
+  stay, so manual re-triggers remain harmless; cron-job.org's own failure
+  notifications are now the watchdog for missed triggers.
+
 ## [0.2.6] - 2026-11-13
 
 ### Added

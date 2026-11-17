@@ -1,8 +1,6 @@
 name: TW chip supplement
 
 on:
-  schedule:
-    - cron: "50 13 * * 1-5"   # 21:50 Taipei backup (primary trigger = cron-job.org → workflow_dispatch; T86 ~17:00 + margin balance ~21:30 both published by then)
   workflow_dispatch:
     inputs:
       force:

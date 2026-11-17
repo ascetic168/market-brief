@@ -1,8 +1,6 @@
 name: US closing report
 
 on:
-  schedule:
-    - cron: "33 21 * * 2-6"   # 05:33 Taipei backup (primary trigger = cron-job.org -> workflow_dispatch; US closes 16:00 ET = 04:00/05:00 Taipei)
   workflow_dispatch:
     inputs:
       dry_run:
@@ -17,6 +15,7 @@ on:
 permissions:
   contents: write
   issues: write
+  pages: write
 
 concurrency:
   group: us-report
@@ -115,6 +114,12 @@ jobs:
           git diff --cached --stat
           git commit -m "docs(us): add US market report ${{ steps.gate.outputs.session_date }}" || echo "nothing to commit"
           git push
+
+      - name: Watch Pages build
+        if: "!inputs.dry_run && steps.guard.outputs.skip != 'true' && steps.gate.outputs.skip != 'true'"
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: python scripts/watch_pages_build.py --sha "$(git rev-parse HEAD)"
 
       - name: Open issue on failure
         if: failure()
