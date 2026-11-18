@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.9] - 2026-11-18
+
+### Added
+
+- Git-ignored `intraday/` directory for local intraday briefs. The
+  intraday-brief skill (a ZCode session skill kept outside this repo) saves
+  its market-snapshot reports here (e.g. `intraday/2026-11-18_0915.md`)
+  instead of the `reports/` tree, so intraday snapshots never reach the
+  Pages site, `manifest.json`, or the series memory. The repo stays
+  read-only toward the skill: no commits, no pushes, no workflow dispatches
+  from intraday runs. (0.2.8 skipped — that number is already referenced in
+  AUTOMATION.md for the Pages build watch.)
+
 ## [0.2.7] - 2026-11-17
 
 ### Added
