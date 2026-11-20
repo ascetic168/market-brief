@@ -4,6 +4,24 @@ All notable changes to this project will be documented in this file.
 
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
+## [0.2.10] - 2026-11-20
+
+### Added
+
+- Published the 2026-11-20 intraday crash brief as a special report:
+  `reports/special/2026-11-20-intraday-crash/index.html` (TAIEX −5.96%
+  intraday, the 5th-largest intraday drop on record, 330+ limit-downs;
+  manifest entry added under `market: "special"` so it shows in the 專題
+  filter).
+
+### Changed
+
+- One-off, user-directed override of the 0.2.9 policy: intraday snapshots
+  remain local-only by default, but this specific brief was manually
+  promoted to the Pages site at the owner's explicit request. The
+  intraday-brief skill itself stays read-only toward the repo — no pipeline
+  files (`data/`, workflows, series memory) were touched.
+
 ## [0.2.9] - 2026-11-18
 
 ### Added
