@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>記憶體領漲的黑色星期五：半導體大反彈收復失土，VIX 單日驟降一成（2026-11-27）</title>
+<style>
+  :root{
+    --primary:#496573; --accent:#a22c40; --text:#151617; --muted:#757c7f;
+    --bg:#f4f5f5; --card:#ffffff; --stripe:#eaeced; --border:#c7d3d9;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;padding:0;background:var(--bg);color:var(--text);
+       font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",sans-serif;
+       font-size:16px;line-height:1.7}
+  .wrap{max-width:960px;margin:0 auto;padding:28px 20px 60px}
+  header{border-bottom:3px solid var(--primary);padding-bottom:14px;margin-bottom:22px}
+  .kicker{color:var(--muted);font-size:.85rem;letter-spacing:.25em;font-weight:600}
+  h1{font-size:1.9rem;margin:.2em 0 .3em;color:var(--primary);line-height:1.3}
+  .meta{color:var(--muted);font-size:.9rem}
+  .summary{background:var(--card);border-left:5px solid var(--accent);padding:14px 18px;
+           margin:18px 0 8px;font-size:1rem}
+  section{margin-top:34px}
+  h2{font-size:1.3rem;color:var(--primary);border-left:5px solid var(--primary);
+     padding-left:10px;margin:0 0 12px}
+  p{margin:.5em 0}
+  .cards{display:flex;gap:14px;flex-wrap:wrap}
+  .card{flex:1 1 220px;background:var(--card);border:1px solid var(--border);
+        border-top:4px solid var(--primary);padding:14px 16px;text-align:center}
+  .card-label{color:var(--muted);font-size:.9rem;font-weight:600}
+  .card-sym{color:var(--muted);font-size:.78rem;font-weight:400;margin-left:6px}
+  .card-num{font-size:1.85rem;font-weight:700;color:var(--text);margin:.1em 0}
+  .card-chg{font-size:1.05rem;font-weight:700}
+  .card-range{color:var(--muted);font-size:.8rem;margin-top:.3em}
+  table{width:100%;border-collapse:collapse;background:var(--card);margin:10px 0 4px;
+        font-size:.95rem}
+  th{background:var(--primary);color:#fff;padding:9px 10px;font-weight:600;text-align:center}
+  td{padding:8px 10px;border-bottom:1px solid var(--border);vertical-align:middle}
+  tbody tr:nth-child(even){background:var(--stripe)}
+  .c-name{font-weight:700}
+  .c-sym{color:var(--muted);font-size:.8rem;font-weight:400;margin-left:8px}
+  .c-group{color:var(--muted);font-size:.85rem;text-align:center}
+  .c-num{text-align:right;font-variant-numeric:tabular-nums}
+  .caption{color:var(--muted);font-size:.82rem;text-align:center;margin:4px 0 0}
+  .sparks{display:grid;grid-template-columns:1fr;gap:14px}
+  .spark-card{background:var(--card);border:1px solid var(--border);padding:12px 16px 8px}
+  .spark-head{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap}
+  .spark-title{font-weight:700;color:var(--primary)}
+  .spark-now{font-size:1.05rem;font-variant-numeric:tabular-nums}
+  svg{width:100%;height:auto;display:block}
+  .svghi{font-size:12px;fill:var(--text);font-weight:700}
+  .svglo{font-size:12px;fill:var(--muted)}
+  .spark-foot{color:var(--muted);font-size:.8rem;margin-top:4px}
+  ul,ol{padding-left:1.4em;margin:.4em 0}
+  li{margin:.45em 0}
+  .up{color:#c0392b}.down{color:#1e7a46}
+  .quotebox{background:var(--card);border-left:4px solid var(--accent);padding:12px 16px;margin:14px 0}
+  .quotebox .attr{color:var(--muted);font-size:.85rem;margin-top:6px}
+  table.stage td:first-child{font-weight:700;white-space:nowrap}
+  table.stage td:nth-child(3){white-space:nowrap}
+  .note{background:var(--stripe);border:1px dashed var(--border);padding:10px 14px;
+        color:var(--muted);font-size:.88rem;margin:12px 0}
+  .src li{font-size:.9rem;color:var(--muted)}
+  .src a{color:var(--primary);word-break:break-all}
+  footer{margin-top:40px;border-top:1px solid var(--border);padding-top:14px;
+         color:var(--muted);font-size:.85rem}
+  @page{size:A4;margin:13mm 11mm}
+  @media print{
+    *{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+    body{background:#fff}
+    .wrap{max-width:none;padding:0}
+    section{break-before:page}
+    section.first{break-before:auto}
+    section:last-of-type{break-before:auto}
+    header{break-inside:avoid}
+    .summary{break-inside:avoid}
+    .card,.spark-card,table{break-inside:avoid}
+    .sparks{break-inside:avoid}
+    footer{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header>
+  <div class="kicker">經濟循環研究 · 收盤快報 CLOSING BRIEF</div>
+  <h1>記憶體領漲的黑色星期五：半導體大反彈收復失土，VIX 單日驟降一成</h1>
+  <div class="meta">收盤定案日期：美東 2026-11-27（感恩節翌日半日市）｜資料來源：Yahoo Finance 官方定案數據＋當日 Google/Bing 新聞彙整</div>
+  <div class="summary">
+<b>一句話結論：</b>黑色星期五半日市，S&P 500 <b class="up">+1.60%</b> 收 7,297.49、Nasdaq <b class="up">+2.31%</b>、費半 <b class="up">+4.69%</b>，AI 權值群感恩節後強勁回補，Micron 大漲 7.60% 領銜記憶體族群，NVDA 相對溫和 +0.80%；VIX 驟降 11.16% 至 23.81 顯示恐慌降溫，但 10 年期殖利率升至 4.94% 提醒 12 月升息定價壓力仍在。結構上，本日是 11/20 低點 6,910.39 確認後的第四根紅K，資金從防禦轉回被錯殺的二線 AI 標的（MU、CRWV、PLTR），量能受半日市壓縮使反彈的「含金量」仍待下週全量交易驗證。<b class="down">推論，非實證</b>：短線反彈不等於落底確認。
+  </div>
+</header>
+
+<section class="first">
+  <h2>一、收盤快照</h2>
+  感恩節翌日紐約證交所與 Nasdaq 提前收盤（半日市），各指數以定案數據呈現：<div class="cards">
+
+      <div class="card">
+        <div class="card-label">S&P 500 <span class="card-sym">GSPC</span></div>
+        <div class="card-num">7,297.49</div>
+        <div class="card-chg" style="color:#c0392b">+1.60%　+114.71</div>
+        <div class="card-range">全日 7,211.46 – 7,304.10</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">Nasdaq Composite <span class="card-sym">IXIC</span></div>
+        <div class="card-num">24,129.50</div>
+        <div class="card-chg" style="color:#c0392b">+2.31%　+543.70</div>
+        <div class="card-range">全日 23,690.60 – 24,149.09</div>
+      </div>
+
+      <div class="card">
+        <div class="card-label">費城半導體 <span class="card-sym">SOX</span></div>
+        <div class="card-num">9,186.71</div>
+        <div class="card-chg" style="color:#c0392b">+4.69%　+411.84</div>
+        <div class="card-range">全日 8,789.31 – 9,213.64</div>
+      </div>
+  </div>
+
+  <table>
+    <thead><tr><th>標的</th><th>類別</th><th>收盤</th><th>漲跌幅</th><th>漲跌</th><th>全日區間</th><th>成交量</th></tr></thead>
+    <tbody>
+      <tr>
+        <td class="c-name">S&P 500<span class="c-sym">GSPC</span></td>
+        <td class="c-group">指數</td>
+        <td class="c-num">7,297.49</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+1.60%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+114.71</td>
+        <td class="c-num">7,211.46 – 7,304.10</td>
+        <td class="c-num">1,715,427,000</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">Nasdaq Composite<span class="c-sym">IXIC</span></td>
+        <td class="c-group">指數</td>
+        <td class="c-num">24,129.50</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+2.31%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+543.70</td>
+        <td class="c-num">23,690.60 – 24,149.09</td>
+        <td class="c-num">4,931,362,000</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">Dow Jones<span class="c-sym">DJI</span></td>
+        <td class="c-group">指數</td>
+        <td class="c-num">50,774.94</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+1.18%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+591.99</td>
+        <td class="c-num">50,398.29 – 50,830.19</td>
+        <td class="c-num">365,405,114</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">費城半導體<span class="c-sym">SOX</span></td>
+        <td class="c-group">指數</td>
+        <td class="c-num">9,186.71</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+4.69%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+411.84</td>
+        <td class="c-num">8,789.31 – 9,213.64</td>
+        <td class="c-num">—</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">VIX 恐慌指數<span class="c-sym">VIX</span></td>
+        <td class="c-group">總體</td>
+        <td class="c-num">23.81</td>
+        <td class="c-num" style="color:#1e7a46"><span style="white-space:nowrap"><b>-11.16%</b></span></td>
+        <td class="c-num" style="color:#1e7a46">-2.99</td>
+        <td class="c-num">23.81 – 27.52</td>
+        <td class="c-num">—</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">美債10年殖利率<span class="c-sym">TNX</span></td>
+        <td class="c-group">總體</td>
+        <td class="c-num">4.94</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+1.82%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+0.09</td>
+        <td class="c-num">4.88 – 4.94</td>
+        <td class="c-num">—</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">Nvidia<span class="c-sym">NVDA</span></td>
+        <td class="c-group">AI／個股</td>
+        <td class="c-num">150.49</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+0.80%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+1.19</td>
+        <td class="c-num">145.39 – 151.98</td>
+        <td class="c-num">180,940,449</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">Broadcom<span class="c-sym">AVGO</span></td>
+        <td class="c-group">AI／個股</td>
+        <td class="c-num">312.34</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+3.82%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+11.48</td>
+        <td class="c-num">304.75 – 313.12</td>
+        <td class="c-num">17,045,811</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">Palantir<span class="c-sym">PLTR</span></td>
+        <td class="c-group">AI／個股</td>
+        <td class="c-num">172.17</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+5.24%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+8.58</td>
+        <td class="c-num">164.80 – 173.22</td>
+        <td class="c-num">14,987,597</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">Micron<span class="c-sym">MU</span></td>
+        <td class="c-group">AI／個股</td>
+        <td class="c-num">646.95</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+7.60%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+45.70</td>
+        <td class="c-num">607.27 – 654.33</td>
+        <td class="c-num">26,547,049</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">Oracle<span class="c-sym">ORCL</span></td>
+        <td class="c-group">AI／個股</td>
+        <td class="c-num">107.13</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+3.13%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+3.25</td>
+        <td class="c-num">104.04 – 107.54</td>
+        <td class="c-num">14,603,170</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">CoreWeave<span class="c-sym">CRWV</span></td>
+        <td class="c-group">AI／個股</td>
+        <td class="c-num">44.15</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+3.71%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+1.58</td>
+        <td class="c-num">40.88 – 44.22</td>
+        <td class="c-num">41,517,676</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">Tesla<span class="c-sym">TSLA</span></td>
+        <td class="c-group">AI／個股</td>
+        <td class="c-num">400.00</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+5.22%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+19.86</td>
+        <td class="c-num">384.66 – 401.18</td>
+        <td class="c-num">25,702,955</td>
+      </tr>
+
+      <tr>
+        <td class="c-name">台積電ADR<span class="c-sym">TSM</span></td>
+        <td class="c-group">AI／個股</td>
+        <td class="c-num">353.34</td>
+        <td class="c-num" style="color:#c0392b"><span style="white-space:nowrap"><b>+3.21%</b></span></td>
+        <td class="c-num" style="color:#c0392b">+11.00</td>
+        <td class="c-num">344.60 – 354.36</td>
+        <td class="c-num">9,436,839</td>
+      </tr>
+    </tbody>
+  </table>
+  <p class="caption">表 1：美股主要指數與標的收盤行情（紅漲／綠跌；資料：Yahoo Finance 定案數據）</p>
+</section>
+
+<section>
+  <h2>二、全日走勢</h2>
+  <div class="sparks">
+
+    <div class="spark-card">
+      <div class="spark-head"><span class="spark-title">S&P 500 <span class="card-sym">GSPC</span></span>
+        <span class="spark-now" style="color:#c0392b">收 7,297.49　<b>+1.60%</b></span></div>
+      <svg viewBox="0 0 700 120" preserveAspectRatio="none" role="img" aria-label="S&P 500 全日走勢">
+        <path d="M 10.0 110.0 L 10.0,73.8 26.2,91.6 42.4,82.2 58.6,98.3 74.8,94.7 91.0,110.0 107.1,105.4 123.3,98.8 139.5,84.5 155.7,80.7 171.9,70.3 188.1,76.6 204.3,74.5 220.5,50.2 236.7,46.5 252.9,50.3 269.0,54.5 285.2,50.8 301.4,48.4 317.6,51.4 333.8,59.1 350.0,55.7 366.2,53.2 382.4,49.1 398.6,36.6 414.8,49.5 431.0,39.2 447.1,30.8 463.3,23.7 479.5,36.1 495.7,41.4 511.9,38.2 528.1,41.6 544.3,36.3 560.5,31.7 576.7,32.6 592.9,30.8 609.0,39.8 625.2,39.1 641.4,46.5 657.6,35.4 673.8,10.0 690.0,17.5 L 690.0 110.0 Z" fill="rgba(73,101,117,0.10)" stroke="none"/>
+        <polyline points="10.0,73.8 26.2,91.6 42.4,82.2 58.6,98.3 74.8,94.7 91.0,110.0 107.1,105.4 123.3,98.8 139.5,84.5 155.7,80.7 171.9,70.3 188.1,76.6 204.3,74.5 220.5,50.2 236.7,46.5 252.9,50.3 269.0,54.5 285.2,50.8 301.4,48.4 317.6,51.4 333.8,59.1 350.0,55.7 366.2,53.2 382.4,49.1 398.6,36.6 414.8,49.5 431.0,39.2 447.1,30.8 463.3,23.7 479.5,36.1 495.7,41.4 511.9,38.2 528.1,41.6 544.3,36.3 560.5,31.7 576.7,32.6 592.9,30.8 609.0,39.8 625.2,39.1 641.4,46.5 657.6,35.4 673.8,10.0 690.0,17.5" fill="none" stroke="#496573" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="690.0" cy="17.5" r="4" fill="#c0392b"/>
+        <text x="10" y="13" class="svghi">7,304.10</text>
+        <text x="10" y="118" class="svglo">7,215.57</text>
+      </svg>
+      <div class="spark-foot">09:30–16:00 美東 · 全日區間 7,211.46 – 7,304.10</div>
+    </div>
+
+    <div class="spark-card">
+      <div class="spark-head"><span class="spark-title">Nasdaq Composite <span class="card-sym">IXIC</span></span>
+        <span class="spark-now" style="color:#c0392b">收 24,129.50　<b>+2.31%</b></span></div>
+      <svg viewBox="0 0 700 120" preserveAspectRatio="none" role="img" aria-label="Nasdaq Composite 全日走勢">
+        <path d="M 10.0 110.0 L 10.0,81.7 26.2,95.6 42.4,88.9 58.6,104.9 74.8,98.6 91.0,110.0 107.1,108.4 123.3,102.6 139.5,84.1 155.7,79.1 171.9,72.7 188.1,79.7 204.3,75.6 220.5,49.7 236.7,47.6 252.9,51.4 269.0,55.7 285.2,51.9 301.4,49.8 317.6,50.1 333.8,58.5 350.0,57.9 366.2,53.4 382.4,50.4 398.6,40.5 414.8,50.1 431.0,43.2 447.1,37.0 463.3,29.8 479.5,40.2 495.7,46.7 511.9,42.2 528.1,42.2 544.3,38.3 560.5,34.8 576.7,35.7 592.9,36.2 609.0,42.9 625.2,40.7 641.4,44.4 657.6,35.3 673.8,10.0 690.0,14.5 L 690.0 110.0 Z" fill="rgba(73,101,117,0.10)" stroke="none"/>
+        <polyline points="10.0,81.7 26.2,95.6 42.4,88.9 58.6,104.9 74.8,98.6 91.0,110.0 107.1,108.4 123.3,102.6 139.5,84.1 155.7,79.1 171.9,72.7 188.1,79.7 204.3,75.6 220.5,49.7 236.7,47.6 252.9,51.4 269.0,55.7 285.2,51.9 301.4,49.8 317.6,50.1 333.8,58.5 350.0,57.9 366.2,53.4 382.4,50.4 398.6,40.5 414.8,50.1 431.0,43.2 447.1,37.0 463.3,29.8 479.5,40.2 495.7,46.7 511.9,42.2 528.1,42.2 544.3,38.3 560.5,34.8 576.7,35.7 592.9,36.2 609.0,42.9 625.2,40.7 641.4,44.4 657.6,35.3 673.8,10.0 690.0,14.5" fill="none" stroke="#496573" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="690.0" cy="14.5" r="4" fill="#c0392b"/>
+        <text x="10" y="13" class="svghi">24,149.09</text>
+        <text x="10" y="118" class="svglo">23,716.25</text>
+      </svg>
+      <div class="spark-foot">09:30–16:00 美東 · 全日區間 23,690.60 – 24,149.09</div>
+    </div>
+
+    <div class="spark-card">
+      <div class="spark-head"><span class="spark-title">Nvidia <span class="card-sym">NVDA</span></span>
+        <span class="spark-now" style="color:#c0392b">收 150.49　<b>+0.80%</b></span></div>
+      <svg viewBox="0 0 700 120" preserveAspectRatio="none" role="img" aria-label="Nvidia 全日走勢">
+        <path d="M 10.0 110.0 L 10.0,72.4 26.2,85.3 42.4,75.6 58.6,110.0 74.8,95.2 91.0,102.3 107.1,109.6 123.3,103.8 139.5,83.3 155.7,88.7 171.9,89.1 188.1,88.5 204.3,94.3 220.5,68.5 236.7,67.4 252.9,71.5 269.0,81.6 285.2,78.2 301.4,65.5 317.6,61.8 333.8,66.3 350.0,63.8 366.2,58.4 382.4,49.8 398.6,39.5 414.8,53.7 431.0,47.6 447.1,45.3 463.3,34.5 479.5,47.8 495.7,58.2 511.9,47.6 528.1,46.8 544.3,39.7 560.5,35.2 576.7,37.3 592.9,41.4 609.0,49.4 625.2,42.3 641.4,48.3 657.6,39.7 673.8,10.0 690.0,26.6 L 690.0 110.0 Z" fill="rgba(73,101,117,0.10)" stroke="none"/>
+        <polyline points="10.0,72.4 26.2,85.3 42.4,75.6 58.6,110.0 74.8,95.2 91.0,102.3 107.1,109.6 123.3,103.8 139.5,83.3 155.7,88.7 171.9,89.1 188.1,88.5 204.3,94.3 220.5,68.5 236.7,67.4 252.9,71.5 269.0,81.6 285.2,78.2 301.4,65.5 317.6,61.8 333.8,66.3 350.0,63.8 366.2,58.4 382.4,49.8 398.6,39.5 414.8,53.7 431.0,47.6 447.1,45.3 463.3,34.5 479.5,47.8 495.7,58.2 511.9,47.6 528.1,46.8 544.3,39.7 560.5,35.2 576.7,37.3 592.9,41.4 609.0,49.4 625.2,42.3 641.4,48.3 657.6,39.7 673.8,10.0 690.0,26.6" fill="none" stroke="#496573" stroke-width="2" stroke-linejoin="round"/>
+        <circle cx="690.0" cy="26.6" r="4" fill="#c0392b"/>
+        <text x="10" y="13" class="svghi">150.62</text>
+        <text x="10" y="118" class="svglo">145.97</text>
+      </svg>
+      <div class="spark-foot">09:30–16:00 美東 · 全日區間 145.39 – 151.98</div>
+    </div>
+    </div>
+S&P 500 全日区间 7,211.46–7,304.10，開高後沿日高整理，未再觸及 7,000 關；費半盤中最深漲逾 5%、區間 8,789.31–9,213.64，自 11/20 崩跌區大幅收復；NVDA 全日 145.39–151.98，早盤下探後翻紅，漲幅明顯落後族群（AVGO +3.82%、TSM ADR +3.21%），顯示本輪反彈由「capex 地板論」外圍的記憶體與二線 AI 承接，而非 NVDA 單點拉動。
+</section>
+
+<section>
+  <h2>三、收盤解讀：記憶體接棒，反彈從「單點」變「廣度」</h2>
+  <ul>
+<li><b>本輪反彈的主角換人了：記憶體族群領漲。</b>Micron +7.60%、SanDisk/Western Digital 同步大漲（TradingView、Benzinga 11/27 報導），投資人「回到被錯殺的 AI 名單」。結構意義在於：11/25 MU -11.01%、CRWV -11.85% 的二線補跌未被確認為系統性去風險，而是單日恐慌——資金願意在「AI 供過於求」疑慮未消之下回補記憶體，代表市場定價的是錯殺修復而非新敘事（推論，非實證）。</li>
+<li><b>NVDA 相對弱勢 +0.80%，黃仁勳議題仍在消化。</b>NVDA 盤中一度僅 145.39、明顯跑輸費半與台積電 ADR（+3.21%），CNBC「The Tech Download」以「黃仁勳回任能否成為 AI 市場的催化劑」為題，顯示董事會調查與監管尾部風險仍壓抑定價。黃仁勳案的未決狀態（眾議院閉門說明無公開後續）使 NVDA 的修復落後於族群——這是 AI 供應鏈內部的「信用分層」。</li>
+<li><b>感恩節週照樣收紅，但半日市量能是折扣。</b>Quartz 指出三大指數本週在 AI 震盪中仍收週線紅盤；Opening Bell Daily 比較本輪回檔（距高點約 8.1%）與 2018 年路徑。惟本日為半日市（S&P 成交量 17.15 億股低於常態），大漲的可信度須由下週一全量交易複檢——歷史經驗上，短市大漲的統計外推性有限（經驗統計，非實證）。</li>
+<li><b>殖利率不領情：10 年期升至 4.94%。</b>股市大漲當日 ^TNX 上行至 4.94%，接近 5% 心理關，12 月升息定價未被風險偏好掩蓋——股債同步承壓的組合若延續，12 月 FOMC 前的反弹天花板受資金成本制約（推論，非實證）。</li>
+</ul>
+</section>
+
+<section>
+  <h2>四、名家框架印證：Dalio 的「波動急升急降」正在上演</h2>
+  <ul>
+<li><b>Ray Dalio 框架</b>：經典泡沫後段的簽名是波動先急升、後急降——11/20 S&P 單日崩至 6,910.39、11/23 軋空反彈、11/26–27 又連續收紅，正是「急升急降」的教科書節奏。 Dalio 框架提醒：這類波動收斂若無現金流驗證（NVDA 11/17 財報後 sell-the-news 已示警），反彈只是換手而非出清。</li>
+<li><b>Grantham 框架</b>：本日新聞恰好演示其論點——The Globe and Mail（11/27）以「NVDA、MU、SanDisk 前瞻本益比僅 S&P 一半」為題，Motley Fool 也在找「非 NVDA 的長期 AI 標的」：需求與獲利敘事完好，變的是估值承受度；當媒體開始以「半價」行銷 AI 股，正是估值重錨進行時。</li>
+</ul>
+</section>
+
+<section>
+  <h2>五、對台股的連動：下週一 AI 權值群的定價錨</h2>
+  台股 11/28 選舉休市一天，本日美股表現將直接為 11/30 選後首日定價：台積電 ADR <b class="up">+3.21%</b> 收 353.34，為台股電子權值群提供正向錨；記憶體族群（MU +7.60%）大漲對應台股的南亞科、華邦電等記憶體族群補跌後的反彈動能。惟須注意三點：其一，外資台指期淨空單是否回補是 11/30 方向關鍵（系列脈絡）；其二，台股 11/28 選舉結果落地後，內資撐盤結構是否鬆動；其三，NVDA 相對弱勢若延續，權值群的反彈將呈結構分化而非齊漲（推論，非實證）。階段防線現況：台股 10/6 高點 49,968.92，第一防線 39,000–40,000（-20%～-21%）、第二防線 36,000–37,000（杜金龍門檻＋61.8% 回檔）、第三防線 30,000–34,000（謝金河×杜金龍之問＋78.6% 回檔）、極端熊市 22,000（瑞銀情境）。
+</section>
+
+<section>
+  <h2>六、觀察清單</h2>
+  <ol>
+<li><b>下週一（11/30）全量量能複檢</b>：S&P 反彈是否在全量交易下延續，跌破 7,100 則半日市大漲折價處理。</li>
+<li><b>NVDA 相對強弱</b>：145.39 本日低點與 141.17 前低守否；若族群漲而 NVDA 續弱，確認信用分層。</li>
+<li><b>10 年期殖利率 5% 關</b>：^TNX 已至 4.94%，升破 5% 對風險性資產的壓抑是 12 月 FOMC 前最大變數。</li>
+<li><b>11/30 台股選後首日</b>：台積電 ADR +3.21% 的傳導、外資現貨與台指期空單變化、選舉結果對內資結構的影響。</li>
+<li><b>本週美國 PCE 通膨數據</b>：12 月升息定價升溫下的實際值與市場反應。</li>
+<li><b>記憶體族群延續性</b>：MU 654.33 盤中高點能否站穩，檢驗「錯殺修復」vs「供過於求」兩條敘事的勝負。</li>
+<li>追蹤逾時結案：無（本日無逾時項）。</li>
+</ol>
+</section>
+
+<section>
+  <h2>七、資料來源</h2>
+  <ul class="src">
+<li>Yahoo Finance：美股 2026-11-27 收盤定案數據（^GSPC、^IXIC、^DJI、^SOX、^VIX、^TNX 及個股）。</li>
+<li>Yahoo Finance（2026-11-27）：Stock market today: Dow, S&P 500, Nasdaq end holiday week with gains as AI stocks rebound。</li>
+<li>TradingView（2026-11-27）：AI Chip Stocks Roar Back -- Sandisk and Micron Lead the Rally；SNDK, MU, WDC rally as investors return to beaten-down AI names。</li>
+<li>Benzinga（2026-11-27）：Why Is Sandisk Stock Jumping After AI Chip Selloff?；Wall Street returns to wrap up holiday-shortened week。</li>
+<li>StreetInsider（2026-11-27）：Micron stock rises on Black Friday amid AI chip buying。</li>
+<li>The Globe and Mail（2026-11-27）：Nvidia, Micron, and Sandisk Trade at Half the S&P 500's Forward P/E。</li>
+<li>CNBC（2026-11-27）：The Tech Download: Will Jensen Huang's return be the spark the shaky AI market needs?</li>
+<li>Opening Bell Daily（2026-11-27）：S&P 500 pullback vs 2018 with stocks 8.1% off the record；S&P 500 vs 2018 as stocks head into December up 4.9%。</li>
+<li>Quartz（2026-11-27）：S&P 500, Nasdaq and Dow set for winning week despite AI turbulence。</li>
+<li>Clarin.com／Coinpedia（2026-11-27）：Black Friday NYSE、Nasdaq 提前收盤時程。</li>
+<li>系列脈絡：市場位階背景、名家框架、台股階段防線表。</li>
+</ul>
+</section>
+
+<footer>
+本報告為 2026-11-27 美股收盤定案數據；不構成投資建議。<br/>本報告不構成投資建議；由雲端管線自動生成（GitHub Actions＋glm-5.3-flash），生成時間：台北時間 2026-11-28 05:33。
+</footer>
+
+</div>
+</body>
+</html>
